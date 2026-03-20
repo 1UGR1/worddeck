@@ -1,0 +1,1055 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black">
+<meta name="apple-mobile-web-app-title" content="WordDeck">
+<title>WordDeck</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+body{background:#0e0e12;color:#f0eff8;font-family:-apple-system,BlinkMacSystemFont,sans-serif;min-height:100vh;display:flex;flex-direction:column;align-items:center;padding-bottom:60px}
+.hdr{width:100%;max-width:700px;padding:20px 16px 0;display:flex;align-items:center;justify-content:space-between}
+.logo{font-size:22px;font-weight:900;color:#f0c060}.logo span{color:#7b6ef6}
+.badges{display:flex;gap:8px;align-items:center}
+.badge{font-size:11px;color:#7a798a;background:#1c1c26;border:1px solid #2a2a38;padding:4px 11px;border-radius:50px}
+.sync{display:flex;align-items:center;gap:5px;font-size:11px;color:#7a798a;background:#1c1c26;border:1px solid #2a2a38;padding:4px 11px;border-radius:50px}
+.dot{width:6px;height:6px;border-radius:50%;background:#4ade80;transition:background .3s}
+.dot.s{background:#f0c060}.dot.e{background:#f87171}
+.stats{width:100%;max-width:700px;padding:12px 16px 0;display:flex;gap:8px}
+.sp{flex:1;background:#1c1c26;border:1px solid #2a2a38;border-radius:12px;padding:10px 4px;display:flex;flex-direction:column;align-items:center;gap:3px}
+.sp .n{font-size:20px;font-weight:700}.sp .l{font-size:10px;color:#7a798a;text-transform:uppercase;letter-spacing:.4px}
+.ny{color:#f0c060}.ng{color:#4ade80}.nr{color:#f87171}
+.tabs{display:flex;gap:5px;margin:14px 0 0;background:#1c1c26;border:1px solid #2a2a38;padding:5px;border-radius:50px}
+.tb{padding:7px 15px;border-radius:50px;border:none;background:transparent;color:#7a798a;font-size:13px;font-weight:500;cursor:pointer;font-family:-apple-system,sans-serif}
+.tb.on{background:#f0c060;color:#0e0e12;font-weight:700}
+.main{width:100%;max-width:700px;padding:16px 16px 0}
+.sc{display:none}.sc.on{display:block}
+.pb{width:100%;background:#1c1c26;border-radius:50px;height:5px;overflow:hidden;margin-bottom:14px}
+.pbf{height:100%;background:linear-gradient(90deg,#7b6ef6,#f0c060);border-radius:50px;transition:width .4s;width:0%}
+.fcw{display:flex;flex-direction:column;align-items:center;gap:12px}
+.ctrls{display:flex;gap:7px;align-items:center;flex-wrap:wrap;justify-content:center}
+.dtog{display:flex;background:#1c1c26;border:1px solid #2a2a38;border-radius:50px;overflow:hidden}
+.db{padding:6px 12px;border:none;background:transparent;color:#7a798a;font-size:12px;cursor:pointer;font-family:-apple-system,sans-serif}
+.db.on{background:#7b6ef6;color:#fff;font-weight:600}
+.smbtn{padding:6px 11px;border-radius:50px;border:1px solid #2a2a38;background:#1c1c26;color:#7a798a;font-size:12px;cursor:pointer;font-family:-apple-system,sans-serif}
+.smbtn.ron{border-color:#f87171;color:#f87171;background:rgba(248,113,113,.1);font-weight:600}
+.scene{width:100%;max-width:480px;height:270px;-webkit-perspective:1000px;perspective:1000px;cursor:pointer}
+.inner{width:100%;height:100%;-webkit-transform-style:preserve-3d;transform-style:preserve-3d;-webkit-transition:-webkit-transform .45s ease;transition:transform .45s ease;position:relative}
+.inner.flip{-webkit-transform:rotateY(180deg);transform:rotateY(180deg)}
+.face{position:absolute;inset:0;border-radius:16px;display:flex;flex-direction:column;align-items:center;justify-content:center;-webkit-backface-visibility:hidden;backface-visibility:hidden;padding:18px 22px;gap:7px;border:1px solid #2a2a38}
+.face.fr{background:#1c1c26}
+.face.bk{background:#1a1a2e;border-color:#7b6ef6;-webkit-transform:rotateY(180deg);transform:rotateY(180deg)}
+.face.gg{border-color:#4ade80;box-shadow:0 0 0 2px rgba(74,222,128,.1)}
+.face.gr{border-color:#f87171;box-shadow:0 0 0 2px rgba(248,113,113,.1)}
+.cbadge{position:absolute;top:11px;right:12px;font-size:10px;font-weight:700;padding:2px 8px;border-radius:50px}
+.cbadge.kg{background:rgba(74,222,128,.15);color:#4ade80;border:1px solid rgba(74,222,128,.3)}
+.cbadge.kr{background:rgba(248,113,113,.15);color:#f87171;border:1px solid rgba(248,113,113,.3)}
+.clbl{font-size:10px;letter-spacing:2px;text-transform:uppercase;color:#7a798a}
+.cword{font-size:34px;font-weight:700;text-align:center;line-height:1.1;font-family:Georgia,serif}
+.bk .cword{color:#f0c060}
+.exw{width:100%;border-top:1px solid #2a2a38;padding-top:9px;margin-top:2px;display:flex;flex-direction:column;align-items:center;gap:3px;min-height:40px}
+.exen{font-size:12px;color:#7a798a;text-align:center;font-style:italic;line-height:1.5;max-width:320px}
+.exhl{color:#f0c060;font-style:normal;font-weight:600}
+.extr{font-size:11px;color:#444460;text-align:center}
+.chint{font-size:10px;color:#2a2a44}
+.cnav{display:flex;gap:9px;align-items:center}
+.nbtn{padding:9px 16px;border-radius:50px;border:1px solid #2a2a38;background:#1c1c26;color:#f0eff8;font-size:13px;cursor:pointer;font-family:-apple-system,sans-serif}
+.ninfo{font-size:13px;color:#7a798a;min-width:50px;text-align:center}
+.mrow{display:flex;gap:10px;align-items:center}
+.mbtn{padding:10px 22px;border-radius:50px;border:2px solid;font-size:14px;font-weight:700;cursor:pointer;font-family:-apple-system,sans-serif}
+.mbtn.no{border-color:#f87171;color:#f87171;background:rgba(248,113,113,.07)}
+.mbtn.yes{border-color:#4ade80;color:#4ade80;background:rgba(74,222,128,.07)}
+.wkp{width:100%;max-width:480px;background:#1c1c26;border:1px solid rgba(248,113,113,.3);border-radius:14px;padding:12px 15px}
+.wkt{font-size:13px;font-weight:700;color:#f87171}
+.wks{font-size:11px;color:#7a798a;margin-top:2px}
+.wtags{display:flex;flex-wrap:wrap;gap:5px;margin-top:8px}
+.wtag{background:rgba(248,113,113,.1);border:1px solid rgba(248,113,113,.25);color:#f87171;border-radius:50px;padding:2px 8px;font-size:11px}
+.empty{text-align:center;padding:36px 16px;color:#7a798a;background:#1c1c26;border:1px dashed #2a2a38;border-radius:14px;font-size:13px;width:100%;max-width:480px}
+.empty .ei{font-size:30px;margin-bottom:8px}
+/* QUIZ */
+.qw{display:flex;flex-direction:column;gap:14px}
+.qbox{background:#1c1c26;border:1px solid #2a2a38;border-radius:14px;padding:22px 20px;text-align:center}
+.qlbl{font-size:10px;letter-spacing:2px;color:#7a798a;text-transform:uppercase;margin-bottom:7px}
+.qword{font-size:34px;font-weight:700;color:#f0c060;font-family:Georgia,serif}
+.qsent{font-size:12px;color:#7a798a;font-style:italic;margin-top:8px;line-height:1.5;min-height:16px}
+.qsent .exhl{color:#f0c060;font-style:normal;font-weight:600}
+.qopts{display:grid;grid-template-columns:1fr 1fr;gap:9px}
+.qopt{background:#1c1c26;border:1px solid #2a2a38;border-radius:10px;padding:13px;font-size:14px;cursor:pointer;color:#f0eff8;font-weight:500;text-align:center;font-family:-apple-system,sans-serif;-webkit-appearance:none}
+.qopt.ok{border-color:#4ade80;background:rgba(74,222,128,.1);color:#4ade80}
+.qopt.no{border-color:#f87171;background:rgba(248,113,113,.1);color:#f87171}
+.sbox{text-align:center;padding:36px 20px;background:#1c1c26;border:1px solid #2a2a38;border-radius:14px}
+.snum{font-size:60px;font-weight:700;color:#f0c060;font-family:Georgia,serif;line-height:1}
+.slbl{color:#7a798a;margin-top:6px;font-size:14px}
+.semoji{font-size:40px;margin-bottom:10px}
+.brow{display:flex;gap:9px;justify-content:center;flex-wrap:wrap;margin-top:14px}
+.pbtn{background:#f0c060;color:#0e0e12;border:none;border-radius:50px;padding:10px 20px;font-size:13px;font-weight:700;cursor:pointer;font-family:-apple-system,sans-serif}
+.obtn{background:transparent;border:1px solid #f87171;color:#f87171;border-radius:50px;padding:10px 20px;font-size:13px;font-weight:600;cursor:pointer;font-family:-apple-system,sans-serif}
+/* ADD */
+.aform{background:#1c1c26;border:1px solid #2a2a38;border-radius:14px;padding:18px;display:flex;flex-direction:column;gap:11px;margin-bottom:14px}
+.frow{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.flbl{font-size:10px;color:#7a798a;letter-spacing:1px;text-transform:uppercase;margin-bottom:4px;display:block}
+.fi{background:#16161d;border:1px solid #2a2a38;border-radius:8px;padding:10px 12px;font-size:15px;color:#f0eff8;outline:none;width:100%;font-family:-apple-system,sans-serif;-webkit-appearance:none}
+.fi:focus{border-color:#7b6ef6}
+.fi.err{border-color:#f87171}
+.abtn{background:#f0c060;color:#0e0e12;border:none;border-radius:50px;padding:10px 20px;font-size:13px;font-weight:700;cursor:pointer;font-family:-apple-system,sans-serif;width:100%}
+.lhdr{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:10px;flex-wrap:wrap}
+.ltitle{font-size:18px;font-weight:700;font-family:Georgia,serif}
+.srch{background:#1c1c26;border:1px solid #2a2a38;border-radius:50px;padding:6px 13px;font-size:13px;color:#f0eff8;outline:none;width:150px;font-family:-apple-system,sans-serif;-webkit-appearance:none}
+.wlist{display:flex;flex-direction:column;gap:6px;max-height:450px;overflow-y:auto;-webkit-overflow-scrolling:touch}
+.wi{background:#1c1c26;border:1px solid #2a2a38;border-radius:10px;padding:10px 13px;display:flex;align-items:center;justify-content:space-between}
+.wi.gk{border-left:3px solid #4ade80}.wi.rk{border-left:3px solid #f87171}
+.wit{display:flex;align-items:center;flex-wrap:wrap;gap:5px}
+.wen{font-weight:600;font-size:13px}.wtr{color:#7a798a;font-size:13px}.wsep{color:#2a2a38}
+.wb{font-size:10px;padding:2px 7px;border-radius:50px;font-weight:600}
+.wb.g{background:rgba(74,222,128,.15);color:#4ade80}
+.wb.r{background:rgba(248,113,113,.15);color:#f87171}
+.delbtn{background:none;border:none;color:#7a798a;cursor:pointer;font-size:14px;padding:3px 6px;-webkit-appearance:none}
+.toast{position:fixed;bottom:22px;left:50%;-webkit-transform:translateX(-50%) translateY(60px);transform:translateX(-50%) translateY(60px);background:#1c1c26;border-radius:50px;padding:8px 18px;font-size:13px;font-weight:500;opacity:0;-webkit-transition:all .3s;transition:all .3s;pointer-events:none;z-index:999;white-space:nowrap;border:1px solid #2a2a38}
+.toast.show{opacity:1;-webkit-transform:translateX(-50%) translateY(0);transform:translateX(-50%) translateY(0)}
+.toast.tg{border-color:#4ade80;color:#4ade80}
+.toast.tr{border-color:#f87171;color:#f87171}
+@media(max-width:400px){.qopts{grid-template-columns:1fr}.frow{grid-template-columns:1fr}.cword{font-size:26px}.qword{font-size:26px}}
+</style>
+</head>
+<body>
+<div class="hdr">
+  <div class="logo">Word<span>Deck</span></div>
+  <div class="badges">
+    <div class="sync"><div class="dot" id="dot"></div><span id="synclbl">Hazır</span></div>
+    <div class="badge" id="cntbadge">0 kelime</div>
+  </div>
+</div>
+<div class="stats">
+  <div class="sp"><div class="n ny" id="stot">0</div><div class="l">Toplam</div></div>
+  <div class="sp"><div class="n ng" id="skn">0</div><div class="l">✓ Bildim</div></div>
+  <div class="sp"><div class="n nr" id="swk">0</div><div class="l">✗ Bilmedim</div></div>
+  <div class="sp">
+    <svg width="38" height="38" viewBox="0 0 44 44" style="-webkit-transform:rotate(-90deg);transform:rotate(-90deg)">
+      <circle fill="none" stroke="#2a2a38" stroke-width="4" cx="22" cy="22" r="18"/>
+      <circle id="ring" fill="none" stroke="#4ade80" stroke-width="4" stroke-linecap="round" cx="22" cy="22" r="18" stroke-dasharray="113" stroke-dashoffset="113" style="-webkit-transition:stroke-dashoffset .6s;transition:stroke-dashoffset .6s"/>
+    </svg>
+    <div class="l">İlerleme</div>
+  </div>
+</div>
+<div class="tabs">
+  <button class="tb on" id="tab-fc" onclick="goTab('fc')">🃏 Flashcard</button>
+  <button class="tb" id="tab-qz" onclick="goTab('qz')">🧠 Quiz</button>
+  <button class="tb" id="tab-add" onclick="goTab('add')">📚 Kelimeler</button>
+</div>
+<div class="main">
+  <div class="sc on" id="sc-fc">
+    <div class="fcw">
+      <div class="pb" style="width:100%;max-width:480px"><div class="pbf" id="fcpb"></div></div>
+      <div class="ctrls">
+        <div class="dtog">
+          <button class="db on" id="dEN" onclick="setDir('EN')">🇬🇧 EN→TR</button>
+          <button class="db" id="dTR" onclick="setDir('TR')">🇹🇷 TR→EN</button>
+        </div>
+        <button class="smbtn" onclick="doShuffle()">🔀 Karıştır</button>
+        <button class="smbtn" id="wkbtn" onclick="toggleWeak()">🔴 Zayıflarım</button>
+      </div>
+      <div id="wkpanel" style="display:none;width:100%;max-width:480px">
+        <div class="wkp"><div class="wkt">🔴 Zayıf Mod</div><div class="wks" id="wksub"></div><div class="wtags" id="wktags"></div></div>
+      </div>
+      <div class="scene" id="scene" onclick="flipCard()">
+        <div class="inner" id="inner">
+          <div class="face fr" id="front">
+            <div class="cbadge" id="cbadge" style="display:none"></div>
+            <div class="clbl" id="flbl">İngilizce</div>
+            <div class="cword" id="fword">—</div>
+            <div class="exw" id="exw">
+              <div class="exen" id="exen"></div>
+              <div class="extr" id="extr"></div>
+            </div>
+            <div class="chint">Tıklayarak çeviriyi gör</div>
+          </div>
+          <div class="face bk">
+            <div class="clbl" id="blbl">Türkçe</div>
+            <div class="cword" id="bword">—</div>
+          </div>
+        </div>
+      </div>
+      <div class="cnav" id="fcnav">
+        <button class="nbtn" onclick="prevCard()">← Önceki</button>
+        <span class="ninfo" id="fcinfo">— / —</span>
+        <button class="nbtn" onclick="nextCard()">Sonraki →</button>
+      </div>
+      <div class="mrow" id="fcmarks">
+        <button class="mbtn no" onclick="mark(false)">✗ Bilmedim</button>
+        <button class="mbtn yes" onclick="mark(true)">✓ Bildim</button>
+      </div>
+      <div class="empty" id="fcempty" style="display:none">
+        <div class="ei" id="fcei">📚</div><div id="fcem">Kelime yok.</div>
+      </div>
+    </div>
+  </div>
+  <div class="sc" id="sc-qz">
+    <div class="qw">
+      <div class="pb"><div class="pbf" id="qzpb"></div></div>
+      <div id="qzarea">
+        <div class="qbox">
+          <div class="qlbl" id="qlbl">Türkçesi nedir?</div>
+          <div class="qword" id="qword">—</div>
+          <div class="qsent" id="qsent"></div>
+        </div>
+        <div style="height:9px"></div>
+        <div class="qopts" id="qopts"></div>
+      </div>
+      <div class="sbox" id="qzscore" style="display:none">
+        <div class="semoji" id="semoji">🎉</div>
+        <div class="snum" id="snum">0/0</div>
+        <div class="slbl">doğru cevap</div>
+        <div class="brow">
+          <button class="pbtn" onclick="startQuiz(false)">Tüm Kelimeler</button>
+          <button class="obtn" onclick="startQuiz(true)">🔴 Sadece Zayıflarım</button>
+        </div>
+      </div>
+      <div class="empty" id="qzempty" style="display:none">
+        <div class="ei">🧩</div><div id="qzemmsg">En az 4 kelime gerekli.</div>
+      </div>
+    </div>
+  </div>
+  <div class="sc" id="sc-add">
+    <div class="aform">
+      <div class="frow">
+        <div><label class="flbl">İngilizce</label><input class="fi" id="iEn" placeholder="apple" type="text"></div>
+        <div><label class="flbl">Türkçe</label><input class="fi" id="iTr" placeholder="elma" type="text"></div>
+      </div>
+      <button class="abtn" onclick="addWord()">+ Kelime Ekle</button>
+    </div>
+    <div class="lhdr">
+      <div class="ltitle">Kelime Listesi</div>
+      <input class="srch" id="srch" placeholder="🔍 Ara..." type="text" oninput="renderList()">
+    </div>
+    <div class="wlist" id="wlist"></div>
+    <div class="empty" id="addempty" style="display:none"><div class="ei">🔍</div>Bulunamadı.</div>
+  </div>
+</div>
+<div class="toast" id="toast"></div>
+<script>
+const SENTENCES = {
+  "brother":{"en":"My brother is older than me.","tr":"Erkek kardeşim benden büyük."},
+  "sad":{"en":"She felt sad after the news.","tr":"Haberin ardından üzgün hissetti."},
+  "hunger":{"en":"Hunger is a serious problem.","tr":"Açlık ciddi bir sorundur."},
+  "name":{"en":"What is your name?","tr":"Adın ne?"},
+  "island":{"en":"They live on a small island.","tr":"Küçük bir adada yaşıyorlar."},
+  "man":{"en":"The man walked down the street.","tr":"Adam sokakta yürüdü."},
+  "ache":{"en":"My back started to ache.","tr":"Sırtım ağrımaya başladı."},
+  "family":{"en":"My family is very important to me.","tr":"Ailem benim için çok önemli."},
+  "mind":{"en":"Keep an open mind.","tr":"Açık fikirli ol."},
+  "evening":{"en":"We had dinner in the evening.","tr":"Akşam yemek yedik."},
+  "alcohol":{"en":"He does not drink alcohol.","tr":"Alkol içmez."},
+  "take":{"en":"Please take a seat.","tr":"Lütfen oturun."},
+  "surgery":{"en":"The surgery lasted two hours.","tr":"Ameliyat iki saat sürdü."},
+  "key":{"en":"I lost my key again.","tr":"Anahtarımı yine kaybettim."},
+  "mother":{"en":"My mother cooks very well.","tr":"Annem çok iyi yemek yapar."},
+  "vehicle":{"en":"The vehicle stopped suddenly.","tr":"Araç aniden durdu."},
+  "friend":{"en":"She is my best friend.","tr":"O benim en iyi arkadaşım."},
+  "horse":{"en":"The horse ran very fast.","tr":"At çok hızlı koştu."},
+  "atmosphere":{"en":"The atmosphere in the room was tense.","tr":"Odadaki atmosfer gergindi."},
+  "month":{"en":"I will visit you next month.","tr":"Gelecek ay seni ziyaret edeceğim."},
+  "father":{"en":"My father works every day.","tr":"Babam her gün çalışır."},
+  "garden":{"en":"She grows roses in her garden.","tr":"Bahçesinde gül yetiştiriyor."},
+  "mention":{"en":"He did not mention the problem.","tr":"Sorundan bahsetmedi."},
+  "honeymoon":{"en":"They went to Paris for their honeymoon.","tr":"Balayı için Paris'e gittiler."},
+  "fish":{"en":"I like to eat fish.","tr":"Balık yemeyi severim."},
+  "balcony":{"en":"She reads on the balcony.","tr":"Balkonda okur."},
+  "peaceful":{"en":"The village is very peaceful.","tr":"Köy çok barışçıl."},
+  "thumb":{"en":"He hurt his thumb.","tr":"Baş parmağını yaraladı."},
+  "success":{"en":"Hard work leads to success.","tr":"Sıkı çalışma başarıya götürür."},
+  "president":{"en":"The president gave a speech.","tr":"Başkan bir konuşma yaptı."},
+  "baby":{"en":"The baby is sleeping now.","tr":"Bebek şu an uyuyor."},
+  "determine":{"en":"We need to determine the cause.","tr":"Nedeni belirlememiz gerekiyor."},
+  "feed":{"en":"She feeds the birds every morning.","tr":"Her sabah kuşları besler."},
+  "leave":{"en":"Please leave your shoes at the door.","tr":"Lütfen ayakkabılarını kapıda bırak."},
+  "computer":{"en":"I work on my computer all day.","tr":"Tüm gün bilgisayarımda çalışırım."},
+  "finish":{"en":"Did you finish your homework?","tr":"Ödevini bitirdin mi?"},
+  "bomb":{"en":"The bomb went off at midnight.","tr":"Bomba gece yarısı patladı."},
+  "rotten":{"en":"The fruit was rotten inside.","tr":"Meyvenin içi çürüktü."},
+  "zone":{"en":"This is a restricted zone.","tr":"Burası kısıtlı bir bölge."},
+  "today":{"en":"What are you doing today?","tr":"Bugün ne yapıyorsun?"},
+  "find":{"en":"Can you find my keys?","tr":"Anahtarlarımı bulabilir misin?"},
+  "meet":{"en":"Let us meet at the cafe.","tr":"Kafede buluşalım."},
+  "big":{"en":"They live in a big house.","tr":"Büyük bir evde yaşıyorlar."},
+  "glass":{"en":"She dropped the glass.","tr":"Camı düşürdü."},
+  "device":{"en":"This device is very useful.","tr":"Bu cihaz çok kullanışlı."},
+  "tent":{"en":"We slept in a tent.","tr":"Çadırda uyuduk."},
+  "roof":{"en":"The roof is leaking.","tr":"Çatı akıyor."},
+  "flower":{"en":"She bought a red flower.","tr":"Kırmızı bir çiçek aldı."},
+  "kid":{"en":"The kid is playing outside.","tr":"Çocuk dışarıda oynuyor."},
+  "solve":{"en":"Can you solve this problem?","tr":"Bu problemi çözebilir misin?"},
+  "genius":{"en":"He is a true genius.","tr":"O gerçek bir dahi."},
+  "minute":{"en":"Wait just one minute please.","tr":"Lütfen sadece bir dakika bekle."},
+  "branch":{"en":"The bird sat on a branch.","tr":"Kuş bir dala kondu."},
+  "counsellor":{"en":"She spoke with a counsellor.","tr":"Bir danışmanla konuştu."},
+  "invite":{"en":"Did you invite him to the party?","tr":"Onu partiye davet ettin mi?"},
+  "precious":{"en":"Time is precious.","tr":"Zaman değerlidir."},
+  "change":{"en":"Things can change quickly.","tr":"Şeyler hızla değişebilir."},
+  "hole":{"en":"There is a hole in the wall.","tr":"Duvarda bir delik var."},
+  "try":{"en":"Always try your best.","tr":"Her zaman elinden gelenin en iyisini dene."},
+  "earthquake":{"en":"The earthquake shook the city.","tr":"Deprem şehri sarstı."},
+  "lecture":{"en":"The lecture starts at nine.","tr":"Ders dokuzda başlıyor."},
+  "detail":{"en":"Please pay attention to the detail.","tr":"Lütfen detaya dikkat et."},
+  "state":{"en":"The state controls the army.","tr":"Devlet orduyu kontrol eder."},
+  "carefully":{"en":"Please read carefully.","tr":"Lütfen dikkatlice oku."},
+  "file":{"en":"Save the file before closing.","tr":"Kapatmadan önce dosyayı kaydet."},
+  "button":{"en":"Press the red button.","tr":"Kırmızı düğmeye bas."},
+  "enemy":{"en":"He treated me like an enemy.","tr":"Bana düşman gibi davrandı."},
+  "thought":{"en":"That is an interesting thought.","tr":"Bu ilginç bir düşünce."},
+  "organise":{"en":"Can you organise the meeting?","tr":"Toplantıyı düzenleyebilir misin?"},
+  "regularly":{"en":"Exercise regularly for good health.","tr":"İyi sağlık için düzenli olarak egzersiz yap."},
+  "proper":{"en":"Use proper grammar.","tr":"Düzgün dilbilgisi kullan."},
+  "education":{"en":"Education is very important.","tr":"Eğitim çok önemlidir."},
+  "hand":{"en":"Give me your hand.","tr":"Elini ver bana."},
+  "apple":{"en":"An apple a day keeps the doctor away.","tr":"Günde bir elma doktoru uzak tutar."},
+  "command":{"en":"He gave the command to stop.","tr":"Durma emrini verdi."},
+  "old":{"en":"This is an old building.","tr":"Bu eski bir bina."},
+  "donkey":{"en":"The donkey carried heavy bags.","tr":"Eşşek ağır çantalar taşıdı."},
+  "house":{"en":"They bought a new house.","tr":"Yeni bir ev satın aldılar."},
+  "factory":{"en":"He works in a car factory.","tr":"Araba fabrikasında çalışıyor."},
+  "devoted":{"en":"She is devoted to her work.","tr":"İşine adanmış biri."},
+  "movie":{"en":"Let us watch a movie tonight.","tr":"Bu gece bir film izleyelim."},
+  "firm":{"en":"He works for a big firm.","tr":"Büyük bir firmada çalışıyor."},
+  "victory":{"en":"The team celebrated their victory.","tr":"Takım galibiyetini kutladı."},
+  "strange":{"en":"That is a strange question.","tr":"Bu garip bir soru."},
+  "spend":{"en":"How do you spend your weekends?","tr":"Hafta sonlarını nasıl geçirirsin?"},
+  "pass":{"en":"Did you pass the exam?","tr":"Sınavı geçtin mi?"},
+  "young":{"en":"She is very young for this job.","tr":"Bu iş için çok genç."},
+  "truth":{"en":"Please tell me the truth.","tr":"Lütfen bana gerçeği söyle."},
+  "tense":{"en":"The situation became very tense.","tr":"Durum çok gergin hale geldi."},
+  "bring":{"en":"Can you bring me some water?","tr":"Biraz su getirebilir misin?"},
+  "trip":{"en":"We went on a short trip.","tr":"Kısa bir geziye çıktık."},
+  "entrance":{"en":"Meet me at the entrance.","tr":"Girişte buluş benimle."},
+  "go":{"en":"Let us go to the park.","tr":"Parka gidelim."},
+  "hidden":{"en":"The key was hidden under the mat.","tr":"Anahtar paspasın altında gizliydi."},
+  "goal":{"en":"He scored the winning goal.","tr":"Kazandıran golü attı."},
+  "send":{"en":"Please send me an email.","tr":"Lütfen bana bir e-posta gönder."},
+  "duty":{"en":"It is my duty to help.","tr":"Yardım etmek görevimdir."},
+  "see":{"en":"Can you see the mountain?","tr":"Dağı görebiliyor musun?"},
+  "show":{"en":"Show me your passport please.","tr":"Lütfen pasaportunuzu gösterin."},
+  "group":{"en":"We worked in a small group.","tr":"Küçük bir grupta çalıştık."},
+  "strong":{"en":"You need to be strong.","tr":"Güçlü olman gerekiyor."},
+  "day":{"en":"Have a good day!","tr":"İyi günler!"},
+  "pigeon":{"en":"A pigeon sat on the roof.","tr":"Çatıya bir güvercin kondu."},
+  "beautiful":{"en":"What a beautiful sunset!","tr":"Ne güzel bir gün batımı!"},
+  "weekday":{"en":"I am busy on weekdays.","tr":"Hafta içi meşgulüm."},
+  "weekend":{"en":"What are your plans for the weekend?","tr":"Hafta sonu planların ne?"},
+  "week":{"en":"I will be back next week.","tr":"Gelecek hafta döneceğim."},
+  "map":{"en":"Check the map before you go.","tr":"Gitmeden önce haritaya bak."},
+  "patient":{"en":"The patient is resting now.","tr":"Hasta şu an dinleniyor."},
+  "error":{"en":"There is an error in the code.","tr":"Kodda bir hata var."},
+  "weather":{"en":"The weather is nice today.","tr":"Bugün hava güzel."},
+  "life":{"en":"Life is full of surprises.","tr":"Hayat sürprizlerle dolu."},
+  "prepare":{"en":"Prepare for the test tomorrow.","tr":"Yarınki sınava hazırlan."},
+  "every":{"en":"Every student must attend.","tr":"Her öğrenci katılmak zorunda."},
+  "thief":{"en":"The thief ran away quickly.","tr":"Hırsız hızla kaçtı."},
+  "heater":{"en":"Turn on the heater please.","tr":"Lütfen ısıtıcıyı aç."},
+  "desolate":{"en":"The road was dark and desolate.","tr":"Yol karanlık ve ıssızdı."},
+  "execution":{"en":"The execution was carried out at dawn.","tr":"İdam şafakta gerçekleştirildi."},
+  "convince":{"en":"I tried to convince him.","tr":"Onu ikna etmeye çalıştım."},
+  "pill":{"en":"Take this pill after meals.","tr":"Bu ilacı yemekten sonra al."},
+  "amazing":{"en":"The view is amazing.","tr":"Manzara ilginç/muhteşem."},
+  "stubborn":{"en":"He is very stubborn.","tr":"Çok inatçı biri."},
+  "people":{"en":"Many people came to the event.","tr":"Etkinliğe çok insan geldi."},
+  "rope":{"en":"He tied the rope tightly.","tr":"İpi sıkıca bağladı."},
+  "cancel":{"en":"They had to cancel the flight.","tr":"Uçuşu iptal etmek zorunda kaldılar."},
+  "rude":{"en":"It is rude to interrupt.","tr":"Sözü kesmek kabadır."},
+  "destiny":{"en":"She believed in destiny.","tr":"Kadere inanıyordu."},
+  "woman":{"en":"The woman smiled kindly.","tr":"Kadın kibarca gülümsedi."},
+  "head":{"en":"She shook her head slowly.","tr":"Kafasını yavaşça salladı."},
+  "coffee":{"en":"I drink coffee every morning.","tr":"Her sabah kahve içerim."},
+  "stay":{"en":"Can you stay a little longer?","tr":"Biraz daha kalabilir misin?"},
+  "camera":{"en":"He forgot his camera at home.","tr":"Kamerasını evde unuttu."},
+  "shut":{"en":"Please shut the door.","tr":"Lütfen kapıyı kapat."},
+  "captain":{"en":"The captain gave the order.","tr":"Kaptan emri verdi."},
+  "character":{"en":"He has a strong character.","tr":"Güçlü bir karakteri var."},
+  "decision":{"en":"It was a difficult decision.","tr":"Zor bir karardı."},
+  "stomach":{"en":"My stomach hurts.","tr":"Karnım ağrıyor."},
+  "card":{"en":"Do you have a credit card?","tr":"Kredi kartın var mı?"},
+  "slippery":{"en":"The floor is slippery when wet.","tr":"Zemin ıslakken kaygan olur."},
+  "win":{"en":"We worked hard to win.","tr":"Kazanmak için çok çalıştık."},
+  "cat":{"en":"The cat is sleeping on the couch.","tr":"Kedi kanepede uyuyor."},
+  "side":{"en":"Stand on this side please.","tr":"Lütfen bu tarafta dur."},
+  "short":{"en":"This is a short story.","tr":"Bu kısa bir hikaye."},
+  "kind":{"en":"She is a very kind person.","tr":"Çok kibar bir insan."},
+  "book":{"en":"I read this book last week.","tr":"Geçen hafta bu kitabı okudum."},
+  "clinic":{"en":"The clinic opens at eight.","tr":"Klinik sekizde açılıyor."},
+  "cheat":{"en":"Do not cheat on your exam.","tr":"Sınavda kopya çekme."},
+  "condition":{"en":"The car is in good condition.","tr":"Araba iyi koşulda."},
+  "bad":{"en":"That was a bad idea.","tr":"Bu kötü bir fikirdi."},
+  "village":{"en":"She grew up in a small village.","tr":"Küçük bir köyde büyüdü."},
+  "culture":{"en":"Every country has its own culture.","tr":"Her ülkenin kendi kültürü var."},
+  "library":{"en":"The library closes at nine.","tr":"Kütüphane dokuzda kapanıyor."},
+  "league":{"en":"He plays in the top league.","tr":"En üst ligde oynuyor."},
+  "list":{"en":"Make a list of things to buy.","tr":"Alınacak şeylerin listesini yap."},
+  "restaurant":{"en":"The restaurant was fully booked.","tr":"Restoran tamamen doluydu."},
+  "match":{"en":"The match starts at seven.","tr":"Maç yedide başlıyor."},
+  "blue":{"en":"The sky is bright blue today.","tr":"Bugün gökyüzü parlak mavi."},
+  "meat":{"en":"He does not eat meat.","tr":"Et yemez."},
+  "media":{"en":"The media reported the story.","tr":"Medya haberi aktardı."},
+  "center":{"en":"The mall is in the city center.","tr":"AVM şehir merkezinde."},
+  "busy":{"en":"I am too busy right now.","tr":"Şu an çok meşgulüm."},
+  "occur":{"en":"When did this occur?","tr":"Bu ne zaman meydana geldi?"},
+  "nation":{"en":"The whole nation was proud.","tr":"Tüm millet gurur duyuyordu."},
+  "national":{"en":"This is a national holiday.","tr":"Bu milli bir tatil."},
+  "little":{"en":"She has a little dog.","tr":"Küçük bir köpeği var."},
+  "lovebird":{"en":"The lovebird chirped all day.","tr":"Muhabbet kuşu tüm gün ötüdü."},
+  "struggle":{"en":"Life is a constant struggle.","tr":"Hayat sürekli bir mücadeledir."},
+  "manager":{"en":"The manager called a meeting.","tr":"Müdür toplantı çağrısı yaptı."},
+  "engineer":{"en":"She works as an engineer.","tr":"Mühendis olarak çalışıyor."},
+  "ink":{"en":"The pen ran out of ink.","tr":"Kalemin mürekkebi bitti."},
+  "available":{"en":"Is this seat available?","tr":"Bu koltuk müsait mi?"},
+  "customer":{"en":"The customer is always right.","tr":"Müşteri her zaman haklıdır."},
+  "museum":{"en":"We visited the museum yesterday.","tr":"Dün müzeyi ziyaret ettik."},
+  "number":{"en":"What is your phone number?","tr":"Telefon numaran ne?"},
+  "room":{"en":"My room is on the third floor.","tr":"Odam üçüncü katta."},
+  "school":{"en":"She walks to school every day.","tr":"Her gün yürüyerek okula gider."},
+  "read":{"en":"I love to read books.","tr":"Kitap okumayı severim."},
+  "army":{"en":"He served in the army.","tr":"Orduda görev yaptı."},
+  "player":{"en":"He is the best player on the team.","tr":"Takımın en iyi oyuncusu."},
+  "homework":{"en":"Have you done your homework?","tr":"Ödevini yaptın mı?"},
+  "prize":{"en":"She won first prize.","tr":"Birinci ödülü kazandı."},
+  "student":{"en":"Every student passed the test.","tr":"Her öğrenci testi geçti."},
+  "teacher":{"en":"My teacher is very patient.","tr":"Öğretmenim çok sabırlı."},
+  "dead":{"en":"The plant looks dead.","tr":"Bitki ölmüş gibi görünüyor."},
+  "important":{"en":"This is very important.","tr":"Bu çok önemli."},
+  "precaution":{"en":"Take every precaution.","tr":"Her önlemi al."},
+  "cotton":{"en":"This shirt is made of cotton.","tr":"Bu gömlek pamuktan yapılmış."},
+  "money":{"en":"I do not have enough money.","tr":"Yeterli param yok."},
+  "explosion":{"en":"The explosion was heard far away.","tr":"Patlama uzaktan duyuldu."},
+  "tissue":{"en":"Can you pass me a tissue?","tr":"Bana bir peçete verebilir misin?"},
+  "project":{"en":"We finished the project on time.","tr":"Projeyi zamanında bitirdik."},
+  "reject":{"en":"They decided to reject the offer.","tr":"Teklifi reddetmeye karar verdiler."},
+  "picture":{"en":"She drew a beautiful picture.","tr":"Güzel bir resim çizdi."},
+  "dream":{"en":"I had a strange dream last night.","tr":"Dün gece garip bir rüya gördüm."},
+  "morning":{"en":"Good morning everyone!","tr":"Herkese günaydın!"},
+  "hair":{"en":"She has long black hair.","tr":"Uzun siyah saçları var."},
+  "keep":{"en":"Keep your room clean.","tr":"Odanı temiz tut."},
+  "war":{"en":"War brings only suffering.","tr":"Savaş sadece acı getirir."},
+  "respect":{"en":"Show respect to your elders.","tr":"Büyüklerine saygı göster."},
+  "silent":{"en":"Please be silent during the exam.","tr":"Sınav sırasında lütfen sessiz olun."},
+  "love":{"en":"I love spending time with friends.","tr":"Arkadaşlarla vakit geçirmeyi severim."},
+  "exam":{"en":"The exam was very difficult.","tr":"Sınav çok zordu."},
+  "wizard":{"en":"He dressed as a wizard for the party.","tr":"Parti için sihirbaz olarak giyindi."},
+  "magical":{"en":"The forest looked magical at night.","tr":"Orman gece sihirli görünüyordu."},
+  "street":{"en":"The street was empty at midnight.","tr":"Sokak gece yarısı boştu."},
+  "ask":{"en":"Do not be afraid to ask questions.","tr":"Soru sormaktan korkma."},
+  "problem":{"en":"Every problem has a solution.","tr":"Her sorunun bir çözümü vardır."},
+  "tell":{"en":"Tell me what happened.","tr":"Ne olduğunu söyle bana."},
+  "promise":{"en":"Keep your promise.","tr":"Sözünü tut."},
+  "special":{"en":"Today is a special day.","tr":"Bugün özel bir gün."},
+  "water":{"en":"Drink more water every day.","tr":"Her gün daha fazla su iç."},
+  "presentation":{"en":"The presentation was very clear.","tr":"Sunum çok netti."},
+  "broom":{"en":"She swept the floor with a broom.","tr":"Zemin süpürgeyle süpürdü."},
+  "time":{"en":"There is not enough time.","tr":"Yeterli zaman yok."},
+  "drive":{"en":"He learned to drive at eighteen.","tr":"On sekizinde araba sürmeyi öğrendi."},
+  "driver":{"en":"The driver stopped at the red light.","tr":"Sürücü kırmızı ışıkta durdu."},
+  "milk":{"en":"She drinks milk every morning.","tr":"Her sabah süt içer."},
+  "now":{"en":"Come here right now.","tr":"Hemen şimdi buraya gel."},
+  "cute":{"en":"What a cute little puppy!","tr":"Ne kadar şirin küçük köpek yavrusu!"},
+  "company":{"en":"She started her own company.","tr":"Kendi şirketini kurdu."},
+  "bottle":{"en":"Please hand me that bottle.","tr":"Şu şişeyi bana uzatır mısın?"},
+  "team":{"en":"Our team won the game.","tr":"Takımımız oyunu kazandı."},
+  "demand":{"en":"The workers began to demand higher pay.","tr":"İşçiler daha yüksek ücret talep etmeye başladı."},
+  "historical":{"en":"This is a historical building.","tr":"Bu tarihi bir bina."},
+  "argue":{"en":"They always argue about money.","tr":"Her zaman para konusunda tartışırlar."},
+  "stone":{"en":"She picked up a small stone.","tr":"Küçük bir taş kaldırdı."},
+  "move":{"en":"They plan to move next month.","tr":"Gelecek ay taşınmayı planlıyorlar."},
+  "holiday":{"en":"We had a great holiday.","tr":"Harika bir tatil geçirdik."},
+  "offer":{"en":"They made a good offer.","tr":"İyi bir teklif yaptılar."},
+  "boat":{"en":"We crossed the lake by boat.","tr":"Gölü tekneyle geçtik."},
+  "telephone":{"en":"The telephone rang all morning.","tr":"Telefon tüm sabah çaldı."},
+  "fundamental":{"en":"This is a fundamental rule.","tr":"Bu temel bir kural."},
+  "surrender":{"en":"The army had to surrender.","tr":"Ordu teslim olmak zorunda kaldı."},
+  "trade":{"en":"Trade between countries has increased.","tr":"Ülkeler arası ticaret arttı."},
+  "crocodile":{"en":"A crocodile lay near the river.","tr":"Nehrin yakınında bir timsah yatıyordu."},
+  "meeting":{"en":"The meeting starts in ten minutes.","tr":"Toplantı on dakika sonra başlıyor."},
+  "train":{"en":"The train arrives at noon.","tr":"Tren öğleyin varır."},
+  "consume":{"en":"We consume too much energy.","tr":"Çok fazla enerji tüketiyoruz."},
+  "uncle":{"en":"My uncle lives in another city.","tr":"Amcam başka bir şehirde yaşıyor."},
+  "country":{"en":"Which country are you from?","tr":"Hangi ülkedensin?"},
+  "famous":{"en":"She is famous all over the world.","tr":"Tüm dünyada ünlü."},
+  "shy":{"en":"He is too shy to speak in public.","tr":"Halk önünde konuşmak için çok ürkek."},
+  "give":{"en":"Can you give me your number?","tr":"Numaranı verir misin?"},
+  "virus":{"en":"The virus spread very quickly.","tr":"Virüs çok hızlı yayıldı."},
+  "foreign":{"en":"She speaks three foreign languages.","tr":"Üç yabancı dil konuşuyor."},
+  "rain":{"en":"The rain started suddenly.","tr":"Yağmur aniden başladı."},
+  "rainy":{"en":"It is a cold and rainy day.","tr":"Soğuk ve yağmurlu bir gün."},
+  "arrest":{"en":"The police arrested the suspect.","tr":"Polis şüpheliyi yakaladı."},
+  "beg":{"en":"I beg you to help me.","tr":"Senden yardım etmeni yalvarıyorum."},
+  "side effect":{"en":"This medicine has side effects.","tr":"Bu ilacın yan etkileri var."},
+  "do":{"en":"What do you want to do?","tr":"Ne yapmak istiyorsun?"},
+  "monster":{"en":"The child was afraid of monsters.","tr":"Çocuk yaratıklardan korkuyordu."},
+  "tomorrow":{"en":"See you tomorrow morning.","tr":"Yarın sabah görüşürüz."},
+  "race":{"en":"She won the race easily.","tr":"Yarışı kolayca kazandı."},
+  "law":{"en":"Everyone must follow the law.","tr":"Herkes yasaya uymak zorunda."},
+  "investment":{"en":"It was a smart investment.","tr":"Akıllıca bir yatırımdı."},
+  "summer":{"en":"I love going to the beach in summer.","tr":"Yazın sahile gitmeyi severim."},
+  "write":{"en":"Write your name on the paper.","tr":"Kağıda adını yaz."},
+  "eat":{"en":"Did you eat breakfast today?","tr":"Bugün kahvaltı ettin mi?"},
+  "meal":{"en":"That was a delicious meal.","tr":"Çok lezzetli bir yemekti."},
+  "new":{"en":"I bought a new phone.","tr":"Yeni bir telefon aldım."},
+  "place":{"en":"This is my favourite place.","tr":"Burası en sevdiğim yer."},
+  "talented":{"en":"She is a talented musician.","tr":"Yetenekli bir müzisyen."},
+  "road":{"en":"The road was blocked by snow.","tr":"Yol karla kapanmıştı."},
+  "director":{"en":"He is the director of the film.","tr":"Filmin yönetmeni o."},
+  "walk":{"en":"Let us walk to the station.","tr":"İstasyona yürüyelim."},
+  "envelope":{"en":"Put the letter in the envelope.","tr":"Mektubu zarfa koy."},
+  "hard":{"en":"Learning a language is hard.","tr":"Dil öğrenmek zordur."},
+  "accent":{"en":"She speaks with a French accent.","tr":"Fransız aksanıyla konuşuyor."},
+  "accidentally":{"en":"I accidentally broke the vase.","tr":"Vazoyu kazara kırdım."},
+  "actress":{"en":"She is a famous actress.","tr":"Ünlü bir aktris."},
+  "affect":{"en":"Stress can affect your health.","tr":"Stres sağlığını etkileyebilir."},
+  "agricultural":{"en":"This is an agricultural region.","tr":"Burası tarımsal bir bölge."},
+  "alternative":{"en":"We need an alternative plan.","tr":"Alternatif bir plana ihtiyacımız var."},
+  "ambition":{"en":"She has great ambition.","tr":"Büyük azmi var."},
+  "analyze":{"en":"We need to analyze the data.","tr":"Veriyi analiz etmemiz gerekiyor."},
+  "anchorman":{"en":"The anchorman read the news.","tr":"Haber sunucusu haberleri okudu."},
+  "antique":{"en":"She collects antique furniture.","tr":"Antika mobilya koleksiyonu yapıyor."},
+  "architect":{"en":"The architect designed the building.","tr":"Mimar binayı tasarladı."},
+  "area":{"en":"This area is very quiet.","tr":"Bu bölge çok sessiz."},
+  "artificial":{"en":"The flowers were artificial.","tr":"Çiçekler yapay/plastikti."},
+  "athletic":{"en":"He has an athletic body.","tr":"Atletik bir vücudu var."},
+  "attempt":{"en":"It was his third attempt.","tr":"Bu onun üçüncü girişimiydi."},
+  "attend":{"en":"Will you attend the meeting?","tr":"Toplantıya katılacak mısın?"},
+  "attention":{"en":"Pay attention in class.","tr":"Derste dikkat et."},
+  "audience":{"en":"The audience clapped loudly.","tr":"Seyirciler yüksek sesle alkışladı."},
+  "backyard":{"en":"The kids play in the backyard.","tr":"Çocuklar avluda oynuyor."},
+  "beach":{"en":"We spent the day at the beach.","tr":"Günü sahilde geçirdik."},
+  "bed":{"en":"I went to bed early.","tr":"Erken yattım."},
+  "beggar":{"en":"A beggar sat outside the store.","tr":"Mağazanın önünde bir dilenci oturuyordu."},
+  "belonging":{"en":"Check your belongings before leaving.","tr":"Ayrılmadan önce eşyalarını kontrol et."},
+  "bicycle":{"en":"She rides her bicycle to school.","tr":"Bisikletiyle okula gidiyor."},
+  "bird":{"en":"A bird sang outside the window.","tr":"Pencerenin dışında bir kuş şarkı söyledi."},
+  "birth":{"en":"What is your date of birth?","tr":"Doğum tarihin ne?"},
+  "bloody":{"en":"It was a bloody battle.","tr":"Kanlı bir savaştı."},
+  "bone":{"en":"She broke a bone in her arm.","tr":"Kolundaki bir kemiği kırdı."},
+  "broadcast":{"en":"The match was broadcast live.","tr":"Maç canlı olarak yayınlandı."},
+  "budget":{"en":"We need to cut the budget.","tr":"Bütçeyi kesmemiz gerekiyor."},
+  "building":{"en":"The building has ten floors.","tr":"Binanın on katı var."},
+  "business":{"en":"He started his own business.","tr":"Kendi işini kurdu."},
+  "call":{"en":"I will call you later.","tr":"Seni sonra arayacağım."},
+  "camel":{"en":"Camels can go days without water.","tr":"Develer günlerce susuz kalabilir."},
+  "candidate":{"en":"She is the best candidate.","tr":"En iyi aday o."},
+  "capacity":{"en":"The hall has a capacity of 500.","tr":"Salonun kapasitesi 500 kişi."},
+  "car":{"en":"My car needs a service.","tr":"Arabam servise ihtiyaç duyuyor."},
+  "care":{"en":"She takes care of her sister.","tr":"Kız kardeşine bakıyor."},
+  "careful":{"en":"Be careful on the stairs.","tr":"Merdivenlerde dikkatli ol."},
+  "case":{"en":"In that case we should leave.","tr":"Bu durumda gitmeliyiz."},
+  "light":{"en":"Turn off the light please.","tr":"Lütfen ışığı kapat."},
+  "certain":{"en":"Are you certain about this?","tr":"Bundan emin misin?"},
+  "chaotic":{"en":"The situation was chaotic.","tr":"Durum karmaşıktı."},
+  "chest":{"en":"He felt a pain in his chest.","tr":"Göğsünde ağrı hissetti."},
+  "city":{"en":"Istanbul is a very big city.","tr":"İstanbul çok büyük bir şehir."},
+  "clean":{"en":"Clean your room before dinner.","tr":"Yemekten önce odanı temizle."},
+  "client":{"en":"The client was very happy.","tr":"Müşteri çok mutluydu."},
+  "cloud":{"en":"Dark clouds covered the sky.","tr":"Karanlık bulutlar gökyüzünü kapladı."},
+  "cold":{"en":"I feel cold today.","tr":"Bugün soğuk hissediyorum."},
+  "concert":{"en":"The concert was sold out.","tr":"Konser tükendi."},
+  "confidential":{"en":"This information is confidential.","tr":"Bu bilgi gizlidir."},
+  "confirmation":{"en":"I am waiting for confirmation.","tr":"Onay bekliyorum."},
+  "conscious":{"en":"She was conscious the whole time.","tr":"Tüm süre boyunca bilinçliydi."},
+  "consider":{"en":"Consider all your options.","tr":"Tüm seçeneklerini düşün."},
+  "continent":{"en":"Europe is a small continent.","tr":"Avrupa küçük bir kıta."},
+  "contract":{"en":"Read the contract carefully.","tr":"Sözleşmeyi dikkatlice oku."},
+  "cop":{"en":"The cop stopped the driver.","tr":"Polis sürücüyü durdurdu."},
+  "course":{"en":"I am taking an English course.","tr":"İngilizce kursu alıyorum."},
+  "cousin":{"en":"My cousin lives in Ankara.","tr":"Kuzenim Ankara'da yaşıyor."},
+  "crisis":{"en":"The country faces an economic crisis.","tr":"Ülke ekonomik bir krizle karşı karşıya."},
+  "curb":{"en":"We must curb spending.","tr":"Harcamaları kısıtlamalıyız."},
+  "cure":{"en":"There is no cure yet.","tr":"Henüz bir tedavi yok."},
+  "damage":{"en":"The storm caused a lot of damage.","tr":"Fırtına büyük hasar verdi."},
+  "dance":{"en":"She loves to dance.","tr":"Dans etmeyi seviyor."},
+  "debate":{"en":"The debate lasted two hours.","tr":"Tartışma iki saat sürdü."},
+  "deceased":{"en":"He is the deceased owner.","tr":"O rahmetli sahibi."},
+  "deep":{"en":"The lake is very deep.","tr":"Göl çok derin."},
+  "definite":{"en":"There is no definite answer.","tr":"Kesin bir cevap yok."},
+  "destination":{"en":"What is your final destination?","tr":"Son hedefin ne?"},
+  "different":{"en":"We all have different opinions.","tr":"Hepimizin farklı görüşleri var."},
+  "difficult":{"en":"This task is difficult.","tr":"Bu görev zor."},
+  "discover":{"en":"She was the first to discover it.","tr":"Onu ilk keşfeden oydu."},
+  "disease":{"en":"The disease spread quickly.","tr":"Hastalık hızla yayıldı."},
+  "dismissal":{"en":"His dismissal shocked everyone.","tr":"İşten çıkarılması herkesi şok etti."},
+  "divorcement":{"en":"The divorcement was difficult.","tr":"Boşanma zordu."},
+  "document":{"en":"Sign the document here.","tr":"Belgeyi buraya imzala."},
+  "door":{"en":"Please close the door.","tr":"Lütfen kapıyı kapat."},
+  "draw":{"en":"She can draw very well.","tr":"Çok iyi çizim yapabilir."},
+  "dwarf":{"en":"The story features seven dwarfs.","tr":"Hikayede yedi cüce yer alıyor."},
+  "early":{"en":"Wake up early tomorrow.","tr":"Yarın erken kalk."},
+  "easy":{"en":"The test was easy.","tr":"Test kolaydı."},
+  "emotional":{"en":"It was a very emotional moment.","tr":"Çok duygusal bir andı."},
+  "emperor":{"en":"The emperor ruled for many years.","tr":"İmparator yıllarca hüküm sürdü."},
+  "empty":{"en":"The glass is empty.","tr":"Bardak boş."},
+  "everybody":{"en":"Everybody loves a good story.","tr":"Herkes iyi bir hikayeyi sever."},
+  "exercise":{"en":"Exercise is good for your health.","tr":"Egzersiz sağlığınız için iyidir."},
+  "eyes":{"en":"She has beautiful blue eyes.","tr":"Güzel mavi gözleri var."},
+  "fabric":{"en":"This fabric is very soft.","tr":"Bu bez çok yumuşak."},
+  "facility":{"en":"The hotel has great facilities.","tr":"Otelin harika tesisleri var."},
+  "fault":{"en":"It was not my fault.","tr":"Benim hatam değildi."},
+  "field":{"en":"The cows graze in the field.","tr":"İnekler tarlada otluyor."},
+  "final":{"en":"This is the final answer.","tr":"Bu son cevap."},
+  "financial":{"en":"We have some financial problems.","tr":"Bazı finansal sorunlarımız var."},
+  "first":{"en":"She was first in the class.","tr":"Sınıfta birinciydí."},
+  "fisherman":{"en":"The fisherman caught a big fish.","tr":"Balıkçı büyük bir balık yakaladı."},
+  "floor":{"en":"The floor is cold.","tr":"Zemin soğuk."},
+  "flu":{"en":"She caught the flu last week.","tr":"Geçen hafta grip oldu."},
+  "frantic":{"en":"She was frantic with worry.","tr":"Endişeyle telaşlanmıştı."},
+  "game":{"en":"Let us play a game.","tr":"Bir oyun oynayalım."},
+  "girl":{"en":"The girl smiled at me.","tr":"Kız bana gülümsedi."},
+  "girlfriend":{"en":"He met his girlfriend at school.","tr":"Kız arkadaşıyla okulda tanıştı."},
+  "government":{"en":"The government raised taxes.","tr":"Hükümet vergileri artırdı."},
+  "graduation":{"en":"Her graduation is next Friday.","tr":"Mezuniyeti önümüzdeki Cuma."},
+  "grandfather":{"en":"My grandfather tells great stories.","tr":"Dedem harika hikayeler anlatır."},
+  "green":{"en":"The grass is green.","tr":"Çimen yeşil."},
+  "grow":{"en":"Children grow very fast.","tr":"Çocuklar çok hızlı büyür."},
+  "guest":{"en":"We have a guest tonight.","tr":"Bu gece misafirimiz var."},
+  "habit":{"en":"Reading is a good habit.","tr":"Okumak iyi bir alışkanlık."},
+  "hall":{"en":"Meet me in the main hall.","tr":"Ana salonda buluş benimle."},
+  "harmful":{"en":"Smoking is harmful to your health.","tr":"Sigara içmek sağlığınıza zararlıdır."},
+  "heart":{"en":"My heart beats very fast.","tr":"Kalbim çok hızlı çarpıyor."},
+  "heavy":{"en":"This bag is very heavy.","tr":"Bu çanta çok ağır."},
+  "help":{"en":"Can you help me please?","tr":"Bana yardım edebilir misin?"},
+  "hereditary":{"en":"The disease is hereditary.","tr":"Hastalık kalıtsaldır."},
+  "high":{"en":"The mountain is very high.","tr":"Dağ çok yüksek."},
+  "history":{"en":"I love learning about history.","tr":"Tarih öğrenmeyi severim."},
+  "holy":{"en":"This is a holy place.","tr":"Burası kutsal bir yer."},
+  "homeless":{"en":"He helped homeless people.","tr":"Evsiz insanlara yardım etti."},
+  "hope":{"en":"I hope everything goes well.","tr":"Her şeyin iyi gitmesini umuyorum."},
+  "hostage":{"en":"The hostage was released safely.","tr":"Rehine güvenle serbest bırakıldı."},
+  "hour":{"en":"Wait one hour please.","tr":"Lütfen bir saat bekle."},
+  "husband":{"en":"Her husband works abroad.","tr":"Kocası yurt dışında çalışıyor."},
+  "intelligence":{"en":"She showed great intelligence.","tr":"Büyük zeka gösterdi."},
+  "ill":{"en":"She felt ill after lunch.","tr":"Öğle yemeğinden sonra hasta hissetti."},
+  "imitation":{"en":"This is an imitation of the original.","tr":"Bu orijinalin taklidi."},
+  "improve":{"en":"Practice will help you improve.","tr":"Pratik yapmak gelişmene yardımcı olur."},
+  "intensive":{"en":"She took an intensive course.","tr":"Yoğun bir kurs aldı."},
+  "interpret":{"en":"Can you interpret this sentence?","tr":"Bu cümleyi yorumlayabilir misin?"},
+  "know":{"en":"Do you know the answer?","tr":"Cevabı biliyor musun?"},
+  "lane":{"en":"Keep to your lane while driving.","tr":"Sürerken şeridinde kal."},
+  "language":{"en":"She speaks five languages.","tr":"Beş dil konuşuyor."},
+  "last":{"en":"This is the last chance.","tr":"Bu son fırsat."},
+  "lawsuit":{"en":"They filed a lawsuit.","tr":"Dava açtılar."},
+  "lawyer":{"en":"She hired a good lawyer.","tr":"İyi bir avukat tuttu."},
+  "learn":{"en":"I want to learn Spanish.","tr":"İspanyolca öğrenmek istiyorum."},
+  "license":{"en":"Do you have a driving license?","tr":"Sürücü lisansın var mı?"},
+  "lonely":{"en":"He felt lonely without his friends.","tr":"Arkadaşları olmadan yalnız hissetti."},
+  "long":{"en":"It was a long journey.","tr":"Uzun bir yolculuktu."},
+  "lover":{"en":"She is a lover of music.","tr":"Müzik aşığı biri."},
+  "management":{"en":"Good management is key.","tr":"İyi yönetim anahtardır."},
+  "manner":{"en":"He has good manners.","tr":"İyi davranışları var."},
+  "many":{"en":"There are many options.","tr":"Birçok seçenek var."},
+  "married":{"en":"They got married last year.","tr":"Geçen yıl evlendiler."},
+  "measure":{"en":"Measure twice cut once.","tr":"İki kez ölç bir kez kes."},
+  "member":{"en":"She is a member of the club.","tr":"Kulübün üyesi."},
+  "method":{"en":"Try a different method.","tr":"Farklı bir metod dene."},
+  "midnight":{"en":"The party ended at midnight.","tr":"Parti gece yarısı bitti."},
+  "minority":{"en":"The minority was protected.","tr":"Azınlık korundu."},
+  "mission":{"en":"The mission was successful.","tr":"Görev başarılıydı."},
+  "mistake":{"en":"Everyone makes mistakes.","tr":"Herkes hata yapar."},
+  "mountain":{"en":"We climbed the mountain.","tr":"Dağa tırmandık."},
+  "municipality":{"en":"The municipality fixed the roads.","tr":"Belediye yolları onardı."},
+  "nanny":{"en":"The nanny looked after the children.","tr":"Dadı çocuklara baktı."},
+  "nature":{"en":"Protect nature for future generations.","tr":"Gelecek nesiller için doğayı koru."},
+  "need":{"en":"I need your help.","tr":"Yardımına ihtiyacım var."},
+  "neighborhood":{"en":"It is a safe neighborhood.","tr":"Güvenli bir mahalle."},
+  "never":{"en":"Never give up on your dreams.","tr":"Hayallerinden asla vazgeçme."},
+  "night":{"en":"The night was very quiet.","tr":"Gece çok sakin geçti."},
+  "nightmare":{"en":"I had a nightmare last night.","tr":"Dün gece kabus gördüm."},
+  "nomadic":{"en":"They lived a nomadic life.","tr":"Göçebe bir yaşam sürdürdüler."},
+  "novel":{"en":"I am reading an interesting novel.","tr":"İlginç bir roman okuyorum."},
+  "obstacle":{"en":"Fear is the biggest obstacle.","tr":"Korku en büyük engeldir."},
+  "official":{"en":"This is the official website.","tr":"Bu resmi web sitesi."},
+  "once":{"en":"I visited Paris once.","tr":"Paris'i bir kez ziyaret ettim."},
+  "online":{"en":"I shop online every week.","tr":"Her hafta online alışveriş yapıyorum."},
+  "operation":{"en":"The operation was a success.","tr":"Operasyon başarılıydı."},
+  "opposition":{"en":"The opposition voted against it.","tr":"Muhalefet buna karşı oy kullandı."},
+  "organization":{"en":"She works for a charity organization.","tr":"Bir yardım organizasyonunda çalışıyor."},
+  "other":{"en":"Do you have any other questions?","tr":"Başka sorunuz var mı?"},
+  "owner":{"en":"Who is the owner of this car?","tr":"Bu arabanın sahibi kim?"},
+  "panic":{"en":"Do not panic everything is fine.","tr":"Panik yapma her şey yolunda."},
+  "paradise":{"en":"This beach is a paradise.","tr":"Bu plaj bir cennet."},
+  "parent":{"en":"Every parent loves their child.","tr":"Her ebeveyn çocuğunu sever."},
+  "parliament":{"en":"The parliament passed the new law.","tr":"Parlamento yeni yasayı geçirdi."},
+  "permission":{"en":"Did you get permission?","tr":"İzin aldın mı?"},
+  "personal":{"en":"This is a personal matter.","tr":"Bu kişisel bir mesele."},
+  "pharmacy":{"en":"The pharmacy is open all night.","tr":"Eczane tüm gece açık."},
+  "phone":{"en":"My phone battery is dead.","tr":"Telefonum şarjı bitti."},
+  "physical":{"en":"Physical exercise is important.","tr":"Fiziksel egzersiz önemlidir."},
+  "plane":{"en":"The plane landed safely.","tr":"Uçak güvenle indi."},
+  "planet":{"en":"Earth is our planet.","tr":"Dünya bizim gezegenimiz."},
+  "plant":{"en":"Water the plant every day.","tr":"Bitkiyi her gün sula."},
+  "pocket":{"en":"He put his keys in his pocket.","tr":"Anahtarlarını cebine koydu."},
+  "poem":{"en":"She wrote a beautiful poem.","tr":"Güzel bir şiir yazdı."},
+  "policeman":{"en":"The policeman helped us.","tr":"Polis bize yardım etti."},
+  "politician":{"en":"The politician gave a speech.","tr":"Politikacı bir konuşma yaptı."},
+  "practice":{"en":"Practice makes perfect.","tr":"Pratik mükemmelleştirir."},
+  "pregnant":{"en":"She is three months pregnant.","tr":"Üç aylık hamilesi."},
+  "prescription":{"en":"You need a prescription for this.","tr":"Bunun için reçete lazım."},
+  "presenter":{"en":"The presenter was very funny.","tr":"Sunucu çok komikti."},
+  "produce":{"en":"This factory produces cars.","tr":"Bu fabrika araba üretiyor."},
+  "product":{"en":"This product is very popular.","tr":"Bu ürün çok popüler."},
+  "provide":{"en":"We provide free meals.","tr":"Ücretsiz yemek sağlıyoruz."},
+  "punish":{"en":"You cannot punish a child like that.","tr":"Bir çocuğu böyle cezalandıramazsın."},
+  "raid":{"en":"Police made a raid at night.","tr":"Polis gece baskın yaptı."},
+  "rapid":{"en":"The city grew at a rapid pace.","tr":"Şehir hızlı bir tempoda büyüdü."},
+  "ready":{"en":"Are you ready to go?","tr":"Gitmeye hazır mısın?"},
+  "real":{"en":"Is this a real diamond?","tr":"Bu gerçek bir elmas mı?"},
+  "reason":{"en":"What is the reason for this?","tr":"Bunun nedeni ne?"},
+  "red":{"en":"She wore a red dress.","tr":"Kırmızı bir elbise giydi."},
+  "referee":{"en":"The referee blew the whistle.","tr":"Hakem düdük çaldı."},
+  "regular":{"en":"He is a regular customer.","tr":"Düzenli bir müşteri."},
+  "rehearsal":{"en":"We have rehearsal tomorrow.","tr":"Yarın provamız var."},
+  "repairman":{"en":"Call the repairman please.","tr":"Lütfen tamircini ara."},
+  "report":{"en":"Write a report by Friday.","tr":"Cuma gününe kadar rapor yaz."},
+  "request":{"en":"I have one request.","tr":"Bir isteğim var."},
+  "result":{"en":"What was the result?","tr":"Sonuç ne oldu?"},
+  "roommate":{"en":"My roommate is very friendly.","tr":"Oda arkadaşım çok arkadaş canlısı."},
+  "rose":{"en":"He gave her a red rose.","tr":"Ona kırmızı bir gül verdi."},
+  "safety":{"en":"Safety comes first.","tr":"Güvenlik her şeyden önce gelir."},
+  "same":{"en":"We had the same idea.","tr":"Aynı fikre sahiptik."},
+  "saturday":{"en":"See you on Saturday.","tr":"Cumartesi görüşürüz."},
+  "say":{"en":"What did you say?","tr":"Ne dedin?"},
+  "scare":{"en":"Do not scare me like that.","tr":"Beni böyle korkutma."},
+  "scientist":{"en":"The scientist made a discovery.","tr":"Bilim insanı bir keşif yaptı."},
+  "season":{"en":"Autumn is my favourite season.","tr":"Sonbahar benim en sevdiğim mevsim."},
+  "secret":{"en":"Can you keep a secret?","tr":"Sır tutabilir misin?"},
+  "servant":{"en":"The servant opened the door.","tr":"Hizmetçi kapıyı açtı."},
+  "severe":{"en":"The pain was severe.","tr":"Acı şiddetliydi."},
+  "shape":{"en":"What shape is this?","tr":"Bu ne şekil?"},
+  "shoe":{"en":"I need new shoes.","tr":"Yeni ayakkabıya ihtiyacım var."},
+  "similar":{"en":"Our ideas are very similar.","tr":"Fikirlerimiz çok benzer."},
+  "singer":{"en":"She is a famous singer.","tr":"Ünlü bir şarkıcı."},
+  "sister":{"en":"My sister is younger than me.","tr":"Kız kardeşim benden küçük."},
+  "sit":{"en":"Please sit down.","tr":"Lütfen oturun."},
+  "situation":{"en":"The situation is getting worse.","tr":"Durum giderek kötüleşiyor."},
+  "skill":{"en":"Cooking is a useful skill.","tr":"Yemek yapmak faydalı bir beceri."},
+  "slow":{"en":"The traffic was very slow.","tr":"Trafik çok yavaştı."},
+  "small":{"en":"She lives in a small apartment.","tr":"Küçük bir dairede yaşıyor."},
+  "smile":{"en":"A smile can change someone's day.","tr":"Bir gülümseme birinin gününü değiştirebilir."},
+  "society":{"en":"We all live in society.","tr":"Hepimiz toplumda yaşıyoruz."},
+  "soil":{"en":"The soil here is very rich.","tr":"Buradaki toprak çok verimli."},
+  "soldier":{"en":"The soldier stood at the gate.","tr":"Asker kapıda duruyordu."},
+  "song":{"en":"That song makes me happy.","tr":"O şarkı beni mutlu eder."},
+  "sportsman":{"en":"He is a true sportsman.","tr":"Gerçek bir sporcu."},
+  "stage":{"en":"She walked onto the stage.","tr":"Sahneye yürüdü."},
+  "still":{"en":"Are you still here?","tr":"Hala burada mısın?"},
+  "stormy":{"en":"It was a stormy night.","tr":"Fırtınalı bir geceydi."},
+  "story":{"en":"Tell me a story.","tr":"Bana bir hikaye anlat."},
+  "strict":{"en":"The teacher was very strict.","tr":"Öğretmen çok katıydı."},
+  "structure":{"en":"The structure of the building is weak.","tr":"Binanın yapısı zayıf."},
+  "successful":{"en":"She was very successful.","tr":"Çok başarılıydı."},
+  "sudden":{"en":"There was a sudden noise.","tr":"Ani bir ses çıktı."},
+  "supplier":{"en":"We need a new supplier.","tr":"Yeni bir tedarikçiye ihtiyacımız var."},
+  "surface":{"en":"The surface is very smooth.","tr":"Yüzey çok pürüzsüz."},
+  "table":{"en":"Set the table for dinner.","tr":"Akşam yemeği için masayı kur."},
+  "talk":{"en":"We need to talk.","tr":"Konuşmamız gerekiyor."},
+  "tea":{"en":"Would you like some tea?","tr":"Biraz çay ister misin?"},
+  "teach":{"en":"She loves to teach children.","tr":"Çocuklara öğretmeyi seviyor."},
+  "thing":{"en":"What is that thing?","tr":"O şey ne?"},
+  "tough":{"en":"It was a tough decision.","tr":"Zorlu bir karardı."},
+  "transform":{"en":"Exercise can transform your body.","tr":"Egzersiz vücudunu dönüştürebilir."},
+  "tribe":{"en":"The tribe lived near the river.","tr":"Kabile nehrin yakınında yaşıyordu."},
+  "type":{"en":"What type of music do you like?","tr":"Ne tür müzik seversin?"},
+  "unity":{"en":"Unity is our strength.","tr":"Birlik bizim gücümüz."},
+  "university":{"en":"She studies at university.","tr":"Üniversitede okuyor."},
+  "updated":{"en":"The app is now updated.","tr":"Uygulama artık güncel."},
+  "urgent":{"en":"This is urgent call me now.","tr":"Bu acil şimdi beni ara."},
+  "vaccine":{"en":"The vaccine protects against disease.","tr":"Aşı hastalığa karşı korur."},
+  "visitor":{"en":"The visitor arrived early.","tr":"Ziyaretçi erken geldi."},
+  "vital":{"en":"Water is vital for life.","tr":"Su hayat için önemlidir."},
+  "voice":{"en":"She has a beautiful voice.","tr":"Güzel bir sesi var."},
+  "volunteer":{"en":"He works as a volunteer.","tr":"Gönüllü olarak çalışıyor."},
+  "wall":{"en":"The wall needs to be painted.","tr":"Duvarın boyanması gerekiyor."},
+  "wallet":{"en":"I left my wallet at home.","tr":"Cüzdanımı evde unuttum."},
+  "warm":{"en":"The weather is warm today.","tr":"Bugün hava sıcak."},
+  "warn":{"en":"I want to warn you.","tr":"Seni uyarmak istiyorum."},
+  "warning":{"en":"This is your final warning.","tr":"Bu son uyarın."},
+  "waterpipe":{"en":"He smoked a waterpipe.","tr":"Nargile içti."},
+  "whistle":{"en":"The referee blew his whistle.","tr":"Hakem düdüğünü çaldı."},
+  "window":{"en":"Open the window please.","tr":"Lütfen pencereyi aç."},
+  "world":{"en":"She wants to travel the world.","tr":"Dünyayı gezmek istiyor."},
+  "wrong":{"en":"Something is wrong here.","tr":"Burada bir şeyler yanlış."},
+  "year":{"en":"This year was very busy.","tr":"Bu yıl çok yoğundu."},
+  "yellow":{"en":"She wore a yellow hat.","tr":"Sarı bir şapka giydi."},
+  "yesterday":{"en":"I saw her yesterday.","tr":"Onu dün gördüm."},
+  "youngster":{"en":"The youngster learned quickly.","tr":"Delikanlı hızlı öğrendi."}
+};
+var WORDS=[{"en": "brother", "tr": "abi"}, {"en": "sad", "tr": "acı"}, {"en": "hunger", "tr": "açlık"}, {"en": "name", "tr": "ad"}, {"en": "island", "tr": "ada"}, {"en": "man", "tr": "adam"}, {"en": "ache", "tr": "ağrımak"}, {"en": "family", "tr": "aile"}, {"en": "mind", "tr": "akıl"}, {"en": "evening", "tr": "akşam"}, {"en": "alcohol", "tr": "alkol"}, {"en": "take", "tr": "almak"}, {"en": "surgery", "tr": "ameliyat"}, {"en": "key", "tr": "anahtar"}, {"en": "mother", "tr": "anne"}, {"en": "vehicle", "tr": "araç"}, {"en": "friend", "tr": "arkadaş"}, {"en": "horse", "tr": "at"}, {"en": "atmosphere", "tr": "atmosfer"}, {"en": "month", "tr": "ay"}, {"en": "father", "tr": "baba"}, {"en": "garden", "tr": "bahçe"}, {"en": "mention", "tr": "bahsetmek"}, {"en": "honeymoon", "tr": "balayı"}, {"en": "fish", "tr": "balık"}, {"en": "balcony", "tr": "balkon"}, {"en": "peaceful", "tr": "barışçıl"}, {"en": "thumb", "tr": "baş parmak"}, {"en": "success", "tr": "başarı"}, {"en": "president", "tr": "başkan"}, {"en": "baby", "tr": "bebek"}, {"en": "determine", "tr": "belirlemek"}, {"en": "feed", "tr": "beslemek"}, {"en": "leave", "tr": "bırakmak"}, {"en": "computer", "tr": "bilgisayar"}, {"en": "finish", "tr": "bitirmek"}, {"en": "bomb", "tr": "bomba"}, {"en": "rotten", "tr": "bozuk"}, {"en": "zone", "tr": "bölge"}, {"en": "today", "tr": "bugün"}, {"en": "find", "tr": "bulmak"}, {"en": "meet", "tr": "buluşmak"}, {"en": "big", "tr": "büyük"}, {"en": "glass", "tr": "cam"}, {"en": "device", "tr": "cihaz"}, {"en": "tent", "tr": "çadır"}, {"en": "roof", "tr": "çatı"}, {"en": "flower", "tr": "çiçek"}, {"en": "kid", "tr": "çocuk"}, {"en": "solve", "tr": "çözmek"}, {"en": "genius", "tr": "dahi"}, {"en": "minute", "tr": "dakika"}, {"en": "branch", "tr": "dal"}, {"en": "counsellor", "tr": "danışman"}, {"en": "invite", "tr": "davet etmek"}, {"en": "precious", "tr": "değerli"}, {"en": "change", "tr": "değiştirmek"}, {"en": "hole", "tr": "delik"}, {"en": "try", "tr": "denemek"}, {"en": "earthquake", "tr": "deprem"}, {"en": "lecture", "tr": "ders"}, {"en": "detail", "tr": "detay"}, {"en": "state", "tr": "devlet"}, {"en": "carefully", "tr": "dikkatli bir şekilde"}, {"en": "file", "tr": "dosya"}, {"en": "button", "tr": "düğme"}, {"en": "enemy", "tr": "düşman"}, {"en": "thought", "tr": "düşünce"}, {"en": "organise", "tr": "düzenlemek"}, {"en": "regularly", "tr": "düzenli olarak"}, {"en": "proper", "tr": "düzgün"}, {"en": "education", "tr": "eğitim"}, {"en": "hand", "tr": "el"}, {"en": "apple", "tr": "elma"}, {"en": "command", "tr": "emir"}, {"en": "old", "tr": "eski"}, {"en": "donkey", "tr": "eşşek"}, {"en": "house", "tr": "ev"}, {"en": "factory", "tr": "fabrika"}, {"en": "devoted", "tr": "fedakar"}, {"en": "movie", "tr": "film"}, {"en": "firm", "tr": "firma"}, {"en": "victory", "tr": "galibiyet"}, {"en": "strange", "tr": "garip"}, {"en": "spend", "tr": "geçirmek"}, {"en": "pass", "tr": "geçmek"}, {"en": "young", "tr": "genç"}, {"en": "truth", "tr": "gerçek"}, {"en": "tense", "tr": "gergin"}, {"en": "bring", "tr": "getirmek"}, {"en": "trip", "tr": "gezi"}, {"en": "entrance", "tr": "giriş"}, {"en": "go", "tr": "gitmek"}, {"en": "hidden", "tr": "gizli"}, {"en": "goal", "tr": "gol"}, {"en": "send", "tr": "göndermek"}, {"en": "duty", "tr": "görev"}, {"en": "see", "tr": "görmek"}, {"en": "show", "tr": "göstermek"}, {"en": "group", "tr": "grup"}, {"en": "strong", "tr": "güçlü"}, {"en": "day", "tr": "gün"}, {"en": "pigeon", "tr": "güvercin"}, {"en": "beautiful", "tr": "güzel"}, {"en": "weekday", "tr": "hafta içi"}, {"en": "weekend", "tr": "hafta sonu"}, {"en": "week", "tr": "hafta"}, {"en": "map", "tr": "harita"}, {"en": "patient", "tr": "hasta"}, {"en": "error", "tr": "hata"}, {"en": "weather", "tr": "hava"}, {"en": "life", "tr": "hayat"}, {"en": "prepare", "tr": "hazırlamak"}, {"en": "every", "tr": "her"}, {"en": "thief", "tr": "hırsız"}, {"en": "heater", "tr": "ısıtıcı"}, {"en": "desolate", "tr": "ıssız"}, {"en": "execution", "tr": "idam"}, {"en": "convince", "tr": "ikna etmek"}, {"en": "pill", "tr": "ilaç"}, {"en": "amazing", "tr": "ilginç"}, {"en": "stubborn", "tr": "inatçı"}, {"en": "people", "tr": "insanlar"}, {"en": "rope", "tr": "ip"}, {"en": "cancel", "tr": "iptal etmek"}, {"en": "rude", "tr": "kaba"}, {"en": "destiny", "tr": "kader"}, {"en": "woman", "tr": "kadın"}, {"en": "head", "tr": "kafa"}, {"en": "coffee", "tr": "kahve"}, {"en": "stay", "tr": "kalmak"}, {"en": "camera", "tr": "kamera"}, {"en": "shut", "tr": "kapatmak"}, {"en": "captain", "tr": "kaptan"}, {"en": "character", "tr": "karakter"}, {"en": "decision", "tr": "karar"}, {"en": "stomach", "tr": "karın"}, {"en": "card", "tr": "kart"}, {"en": "slippery", "tr": "kaygan"}, {"en": "win", "tr": "kazanmak"}, {"en": "cat", "tr": "kedi"}, {"en": "side", "tr": "kenar"}, {"en": "short", "tr": "kısa"}, {"en": "kind", "tr": "kibar"}, {"en": "book", "tr": "kitap"}, {"en": "clinic", "tr": "klinik"}, {"en": "cheat", "tr": "kopya çekmek"}, {"en": "condition", "tr": "koşul"}, {"en": "bad", "tr": "kötü"}, {"en": "village", "tr": "köy"}, {"en": "culture", "tr": "kültür"}, {"en": "library", "tr": "kütüphane"}, {"en": "league", "tr": "lig"}, {"en": "list", "tr": "liste"}, {"en": "restaurant", "tr": "lokanta"}, {"en": "match", "tr": "maç"}, {"en": "blue", "tr": "mavi"}, {"en": "meat", "tr": "et"}, {"en": "media", "tr": "medya"}, {"en": "center", "tr": "merkez"}, {"en": "busy", "tr": "meşgul"}, {"en": "occur", "tr": "meydana gelmek"}, {"en": "nation", "tr": "millet"}, {"en": "national", "tr": "milli"}, {"en": "little", "tr": "minik"}, {"en": "lovebird", "tr": "muhabbet kuşu"}, {"en": "struggle", "tr": "mücadele"}, {"en": "manager", "tr": "müdür"}, {"en": "engineer", "tr": "mühendis"}, {"en": "ink", "tr": "mürekkep"}, {"en": "available", "tr": "müsait"}, {"en": "customer", "tr": "müşteri"}, {"en": "museum", "tr": "müze"}, {"en": "number", "tr": "numara"}, {"en": "room", "tr": "oda"}, {"en": "school", "tr": "okul"}, {"en": "read", "tr": "okumak"}, {"en": "army", "tr": "ordu"}, {"en": "player", "tr": "oyuncu"}, {"en": "homework", "tr": "ödev"}, {"en": "prize", "tr": "ödül"}, {"en": "student", "tr": "öğrenci"}, {"en": "teacher", "tr": "öğretmen"}, {"en": "dead", "tr": "ölmüş"}, {"en": "important", "tr": "önemli"}, {"en": "precaution", "tr": "önlem"}, {"en": "cotton", "tr": "pamuk"}, {"en": "money", "tr": "para"}, {"en": "explosion", "tr": "patlama"}, {"en": "tissue", "tr": "peçete"}, {"en": "project", "tr": "proje"}, {"en": "reject", "tr": "reddetmek"}, {"en": "picture", "tr": "resim"}, {"en": "dream", "tr": "rüya"}, {"en": "morning", "tr": "sabah"}, {"en": "hair", "tr": "saç"}, {"en": "keep", "tr": "saklamak"}, {"en": "war", "tr": "savaş"}, {"en": "respect", "tr": "saygı"}, {"en": "silent", "tr": "sessiz"}, {"en": "love", "tr": "sevmek"}, {"en": "exam", "tr": "sınav"}, {"en": "wizard", "tr": "sihirbaz"}, {"en": "magical", "tr": "sihirli"}, {"en": "street", "tr": "sokak"}, {"en": "ask", "tr": "sormak"}, {"en": "problem", "tr": "sorun"}, {"en": "tell", "tr": "söylemek"}, {"en": "promise", "tr": "söz vermek"}, {"en": "special", "tr": "özel"}, {"en": "water", "tr": "su"}, {"en": "presentation", "tr": "sunum"}, {"en": "broom", "tr": "süpürge"}, {"en": "time", "tr": "süre"}, {"en": "drive", "tr": "sürmek"}, {"en": "driver", "tr": "sürücü"}, {"en": "milk", "tr": "süt"}, {"en": "now", "tr": "şimdi"}, {"en": "cute", "tr": "şirin"}, {"en": "company", "tr": "şirket"}, {"en": "bottle", "tr": "şişe"}, {"en": "team", "tr": "takım"}, {"en": "demand", "tr": "talep etmek"}, {"en": "historical", "tr": "tarihi"}, {"en": "argue", "tr": "tartışmak"}, {"en": "stone", "tr": "taş"}, {"en": "move", "tr": "taşımak"}, {"en": "holiday", "tr": "tatil"}, {"en": "offer", "tr": "teklif"}, {"en": "boat", "tr": "tekne"}, {"en": "telephone", "tr": "telefon"}, {"en": "fundamental", "tr": "temel"}, {"en": "surrender", "tr": "teslim olmak"}, {"en": "trade", "tr": "ticaret"}, {"en": "crocodile", "tr": "timsah"}, {"en": "meeting", "tr": "toplantı"}, {"en": "train", "tr": "tren"}, {"en": "consume", "tr": "tüketmek"}, {"en": "uncle", "tr": "amca"}, {"en": "country", "tr": "ülke"}, {"en": "famous", "tr": "ünlü"}, {"en": "shy", "tr": "ürkek"}, {"en": "give", "tr": "vermek"}, {"en": "virus", "tr": "virüs"}, {"en": "foreign", "tr": "yabancı"}, {"en": "rain", "tr": "yağmur"}, {"en": "rainy", "tr": "yağmurlu"}, {"en": "arrest", "tr": "yakalamak"}, {"en": "beg", "tr": "yalvarmak"}, {"en": "side effect", "tr": "yan etki"}, {"en": "do", "tr": "yapmak"}, {"en": "monster", "tr": "yaratık"}, {"en": "tomorrow", "tr": "yarın"}, {"en": "race", "tr": "yarış"}, {"en": "law", "tr": "yasa"}, {"en": "investment", "tr": "yatırım"}, {"en": "summer", "tr": "yaz"}, {"en": "write", "tr": "yazmak"}, {"en": "eat", "tr": "yemek yemek"}, {"en": "meal", "tr": "yemek"}, {"en": "new", "tr": "yeni"}, {"en": "place", "tr": "yer"}, {"en": "talented", "tr": "yetenekli"}, {"en": "road", "tr": "yol"}, {"en": "director", "tr": "yönetmen"}, {"en": "walk", "tr": "yürümek"}, {"en": "envelope", "tr": "zarf"}, {"en": "hard", "tr": "zor"}, {"en": "accent", "tr": "aksan"}, {"en": "accidentally", "tr": "tesadüfen"}, {"en": "actress", "tr": "aktris"}, {"en": "affect", "tr": "etkilemek"}, {"en": "agricultural", "tr": "tarımsal"}, {"en": "alternative", "tr": "alternatif"}, {"en": "ambition", "tr": "azim"}, {"en": "analyze", "tr": "analiz etmek"}, {"en": "anchorman", "tr": "haber sunucusu"}, {"en": "antique", "tr": "antik"}, {"en": "architect", "tr": "mimar"}, {"en": "area", "tr": "bölge"}, {"en": "artificial", "tr": "yapay"}, {"en": "athletic", "tr": "atletik"}, {"en": "attempt", "tr": "girişim"}, {"en": "attend", "tr": "katılmak"}, {"en": "attention", "tr": "dikkat"}, {"en": "audience", "tr": "seyirci"}, {"en": "backyard", "tr": "avlu"}, {"en": "beach", "tr": "plaj"}, {"en": "bed", "tr": "yatak"}, {"en": "beggar", "tr": "dilenci"}, {"en": "belonging", "tr": "eşya"}, {"en": "bicycle", "tr": "bisiklet"}, {"en": "bird", "tr": "kuş"}, {"en": "birth", "tr": "doğum"}, {"en": "bloody", "tr": "kanlı"}, {"en": "bone", "tr": "kemik"}, {"en": "broadcast", "tr": "yayın"}, {"en": "budget", "tr": "bütçe"}, {"en": "building", "tr": "bina"}, {"en": "business", "tr": "iş"}, {"en": "call", "tr": "aramak"}, {"en": "camel", "tr": "deve"}, {"en": "candidate", "tr": "aday"}, {"en": "capacity", "tr": "kapasite"}, {"en": "car", "tr": "araba"}, {"en": "care", "tr": "bakım"}, {"en": "careful", "tr": "dikkatli"}, {"en": "case", "tr": "durum"}, {"en": "light", "tr": "ışık"}, {"en": "certain", "tr": "kesin"}, {"en": "chaotic", "tr": "karmaşık"}, {"en": "chest", "tr": "sandık"}, {"en": "city", "tr": "şehir"}, {"en": "clean", "tr": "temizlemek"}, {"en": "client", "tr": "müşteri"}, {"en": "cloud", "tr": "bulut"}, {"en": "cold", "tr": "soğuk"}, {"en": "concert", "tr": "konser"}, {"en": "confidential", "tr": "gizli"}, {"en": "confirmation", "tr": "onay"}, {"en": "conscious", "tr": "bilinçli"}, {"en": "consider", "tr": "düşünmek"}, {"en": "continent", "tr": "kıta"}, {"en": "contract", "tr": "sözleşme"}, {"en": "cop", "tr": "polis"}, {"en": "course", "tr": "kurs"}, {"en": "cousin", "tr": "kuzen"}, {"en": "crisis", "tr": "kriz"}, {"en": "curb", "tr": "engellemek"}, {"en": "cure", "tr": "tedavi"}, {"en": "damage", "tr": "hasar"}, {"en": "dance", "tr": "dans"}, {"en": "debate", "tr": "tartışma"}, {"en": "deceased", "tr": "rahmetli"}, {"en": "deep", "tr": "derin"}, {"en": "definite", "tr": "kesin"}, {"en": "destination", "tr": "hedef"}, {"en": "different", "tr": "farklı"}, {"en": "difficult", "tr": "zor"}, {"en": "discover", "tr": "keşfetmek"}, {"en": "disease", "tr": "hastalık"}, {"en": "dismissal", "tr": "kovulma"}, {"en": "divorcement", "tr": "boşanma"}, {"en": "document", "tr": "belge"}, {"en": "door", "tr": "kapı"}, {"en": "draw", "tr": "çekmek"}, {"en": "dwarf", "tr": "cüce"}, {"en": "early", "tr": "erken"}, {"en": "easy", "tr": "kolay"}, {"en": "emotional", "tr": "duygusal"}, {"en": "emperor", "tr": "imparator"}, {"en": "empty", "tr": "boş"}, {"en": "everybody", "tr": "herkes"}, {"en": "exercise", "tr": "egzersiz"}, {"en": "eyes", "tr": "gözler"}, {"en": "fabric", "tr": "bez"}, {"en": "facility", "tr": "tesis"}, {"en": "fault", "tr": "hata"}, {"en": "field", "tr": "tarla"}, {"en": "final", "tr": "son"}, {"en": "financial", "tr": "finansal"}, {"en": "first", "tr": "ilk"}, {"en": "fisherman", "tr": "balıkçı"}, {"en": "floor", "tr": "zemin"}, {"en": "flu", "tr": "grip"}, {"en": "frantic", "tr": "telaşlı"}, {"en": "game", "tr": "oyun"}, {"en": "girl", "tr": "kız"}, {"en": "girlfriend", "tr": "kız arkadaş"}, {"en": "government", "tr": "hükümet"}, {"en": "graduation", "tr": "mezuniyet"}, {"en": "grandfather", "tr": "dede"}, {"en": "green", "tr": "yeşil"}, {"en": "grow", "tr": "büyümek"}, {"en": "guest", "tr": "misafir"}, {"en": "habit", "tr": "alışkanlık"}, {"en": "hall", "tr": "salon"}, {"en": "harmful", "tr": "zararlı"}, {"en": "heart", "tr": "kalp"}, {"en": "heavy", "tr": "yoğun"}, {"en": "help", "tr": "yardım"}, {"en": "hereditary", "tr": "kalıtsal"}, {"en": "high", "tr": "yüksek"}, {"en": "history", "tr": "tarih"}, {"en": "holy", "tr": "kutsal"}, {"en": "homeless", "tr": "evsiz"}, {"en": "hope", "tr": "umut"}, {"en": "hostage", "tr": "rehine"}, {"en": "hour", "tr": "saat"}, {"en": "husband", "tr": "eş"}, {"en": "intelligence", "tr": "zeka"}, {"en": "ill", "tr": "hasta"}, {"en": "imitation", "tr": "taklit"}, {"en": "improve", "tr": "gelişmek"}, {"en": "intensive", "tr": "yoğun"}, {"en": "interpret", "tr": "yorumlamak"}, {"en": "know", "tr": "bilmek"}, {"en": "lane", "tr": "şerit"}, {"en": "language", "tr": "dil"}, {"en": "last", "tr": "son"}, {"en": "lawsuit", "tr": "dava"}, {"en": "lawyer", "tr": "avukat"}, {"en": "learn", "tr": "öğrenmek"}, {"en": "license", "tr": "lisans"}, {"en": "lonely", "tr": "yalnız"}, {"en": "long", "tr": "uzun"}, {"en": "lover", "tr": "aşık"}, {"en": "management", "tr": "yönetim"}, {"en": "manner", "tr": "davranış"}, {"en": "many", "tr": "birçok"}, {"en": "married", "tr": "evli"}, {"en": "measure", "tr": "ölçü"}, {"en": "member", "tr": "üye"}, {"en": "method", "tr": "metod"}, {"en": "midnight", "tr": "geceyarısı"}, {"en": "minority", "tr": "azınlık"}, {"en": "mission", "tr": "görev"}, {"en": "mistake", "tr": "hata"}, {"en": "mountain", "tr": "dağ"}, {"en": "municipality", "tr": "belediye"}, {"en": "nanny", "tr": "dadı"}, {"en": "nature", "tr": "doğa"}, {"en": "need", "tr": "ihtiyaç"}, {"en": "neighborhood", "tr": "mahalle"}, {"en": "never", "tr": "asla"}, {"en": "night", "tr": "gece"}, {"en": "nightmare", "tr": "kabus"}, {"en": "nomadic", "tr": "göçebe"}, {"en": "novel", "tr": "roman"}, {"en": "obstacle", "tr": "engel"}, {"en": "official", "tr": "resmi"}, {"en": "once", "tr": "bir kez"}, {"en": "online", "tr": "çevrim içi"}, {"en": "operation", "tr": "operasyon"}, {"en": "opposition", "tr": "muhalefet"}, {"en": "organization", "tr": "organizasyon"}, {"en": "other", "tr": "diğer"}, {"en": "owner", "tr": "sahip"}, {"en": "panic", "tr": "panik"}, {"en": "paradise", "tr": "cennet"}, {"en": "parent", "tr": "ebeveyn"}, {"en": "parliament", "tr": "parlamento"}, {"en": "permission", "tr": "izin"}, {"en": "personal", "tr": "kişisel"}, {"en": "pharmacy", "tr": "eczane"}, {"en": "phone", "tr": "telefon"}, {"en": "physical", "tr": "fiziksel"}, {"en": "plane", "tr": "uçak"}, {"en": "planet", "tr": "gezegen"}, {"en": "plant", "tr": "bitki"}, {"en": "pocket", "tr": "cep"}, {"en": "poem", "tr": "şiir"}, {"en": "policeman", "tr": "polis"}, {"en": "politician", "tr": "politikacı"}, {"en": "practice", "tr": "egzersiz"}, {"en": "pregnant", "tr": "hamile"}, {"en": "prescription", "tr": "reçete"}, {"en": "presenter", "tr": "sunucu"}, {"en": "produce", "tr": "üretmek"}, {"en": "product", "tr": "ürün"}, {"en": "provide", "tr": "sağlamak"}, {"en": "punish", "tr": "cezalandırmak"}, {"en": "raid", "tr": "baskın"}, {"en": "rapid", "tr": "hızlı"}, {"en": "ready", "tr": "hazır"}, {"en": "real", "tr": "gerçek"}, {"en": "reason", "tr": "neden"}, {"en": "red", "tr": "kırmızı"}, {"en": "referee", "tr": "hakem"}, {"en": "regular", "tr": "düzenli"}, {"en": "rehearsal", "tr": "prova"}, {"en": "repairman", "tr": "tamirci"}, {"en": "report", "tr": "rapor"}, {"en": "request", "tr": "istemek"}, {"en": "result", "tr": "sonuç"}, {"en": "roommate", "tr": "oda arkadaşı"}, {"en": "rose", "tr": "gül"}, {"en": "safety", "tr": "güvenlik"}, {"en": "same", "tr": "aynı"}, {"en": "saturday", "tr": "cumartesi"}, {"en": "say", "tr": "söylemek"}, {"en": "scare", "tr": "korkutmak"}, {"en": "scientist", "tr": "bilim insanı"}, {"en": "season", "tr": "mevsim"}, {"en": "secret", "tr": "sır"}, {"en": "servant", "tr": "hizmetçi"}, {"en": "severe", "tr": "şiddetli"}, {"en": "shape", "tr": "şekil"}, {"en": "shoe", "tr": "ayakkabı"}, {"en": "similar", "tr": "benzer"}, {"en": "singer", "tr": "şarkıcı"}, {"en": "sister", "tr": "kızkardeş"}, {"en": "sit", "tr": "oturmak"}, {"en": "situation", "tr": "durum"}, {"en": "skill", "tr": "beceri"}, {"en": "slow", "tr": "yavaş"}, {"en": "small", "tr": "küçük"}, {"en": "smile", "tr": "gülümsemek"}, {"en": "society", "tr": "toplum"}, {"en": "soil", "tr": "toprak"}, {"en": "soldier", "tr": "asker"}, {"en": "song", "tr": "şarkı"}, {"en": "sportsman", "tr": "sporcu"}, {"en": "stage", "tr": "sahne"}, {"en": "still", "tr": "hala"}, {"en": "stormy", "tr": "fırtınalı"}, {"en": "story", "tr": "hikaye"}, {"en": "strict", "tr": "katı"}, {"en": "structure", "tr": "yapı"}, {"en": "successful", "tr": "başarılı"}, {"en": "sudden", "tr": "ani"}, {"en": "supplier", "tr": "tedarikçi"}, {"en": "surface", "tr": "yüzey"}, {"en": "table", "tr": "masa"}, {"en": "talk", "tr": "konuşmak"}, {"en": "tea", "tr": "çay"}, {"en": "teach", "tr": "öğretmek"}, {"en": "thing", "tr": "şey"}, {"en": "tough", "tr": "zorlu"}, {"en": "transform", "tr": "dönüştürmek"}, {"en": "tribe", "tr": "kavim"}, {"en": "type", "tr": "tür"}, {"en": "unity", "tr": "birlik"}, {"en": "university", "tr": "üniversite"}, {"en": "updated", "tr": "güncel"}, {"en": "urgent", "tr": "acil"}, {"en": "vaccine", "tr": "aşı"}, {"en": "visitor", "tr": "ziyaretçi"}, {"en": "vital", "tr": "önemli"}, {"en": "voice", "tr": "ses"}, {"en": "volunteer", "tr": "gönüllü"}, {"en": "wall", "tr": "duvar"}, {"en": "wallet", "tr": "cüzdan"}, {"en": "warm", "tr": "sıcak"}, {"en": "warn", "tr": "uyarmak"}, {"en": "warning", "tr": "uyarı"}, {"en": "waterpipe", "tr": "nargile"}, {"en": "whistle", "tr": "düdük"}, {"en": "window", "tr": "pencere"}, {"en": "world", "tr": "dünya"}, {"en": "wrong", "tr": "yanlış"}, {"en": "year", "tr": "yıl"}, {"en": "yellow", "tr": "sarı"}, {"en": "yesterday", "tr": "dün"}, {"en": "youngster", "tr": "delikanlı"}];
+
+var SK='wddeck3';
+var prog={};
+var words=[];
+var fcDir='EN';
+var pool=[];
+var idx=0;
+var flipped=false;
+var busy=false;
+var saveT=null;
+var wkMode=false;
+var qpool=[];
+var qidx=0;
+var qscore=0;
+var qdone=false;
+var qanswered=false;
+
+// dedup
+var _s={};
+for(var _i=0;_i<WORDS.length;_i++){
+  if(!_s[WORDS[_i].en]){_s[WORDS[_i].en]=1;words.push(WORDS[_i]);}
+}
+
+function g(id){return document.getElementById(id);}
+
+function loadData(){
+  try{var r=localStorage.getItem(SK);if(r){var d=JSON.parse(r);prog=d.prog||{};}}catch(e){prog={};}
+}
+
+function saveData(){
+  setSS('s');clearTimeout(saveT);
+  saveT=setTimeout(function(){
+    try{localStorage.setItem(SK,JSON.stringify({prog:prog}));setSS('ok');}
+    catch(e){setSS('e');}
+  },800);
+}
+
+function setSS(s){
+  var d=g('dot'),l=g('synclbl');
+  d.className='dot'+(s==='s'?' s':s==='e'?' e':'');
+  l.textContent=s==='s'?'Kaydediliyor...':s==='e'?'Hata':'Kaydedildi ✓';
+}
+
+function sfl(arr){
+  var a=arr.slice();
+  for(var i=a.length-1;i>0;i--){var j=Math.floor(Math.random()*(i+1));var t=a[i];a[i]=a[j];a[j]=t;}
+  return a;
+}
+
+function toast(msg,c){
+  var t=g('toast');t.textContent=msg;t.className='toast show '+(c||'tg');
+  clearTimeout(t._t);t._t=setTimeout(function(){t.className='toast';},2000);
+}
+
+function kn(){return words.filter(function(w){return prog[w.en]===true;});}
+function wk(){return words.filter(function(w){return prog[w.en]===false;});}
+
+function hlW(s,w){
+  return s.replace(new RegExp('('+w.replace(/[.*+?^${}()|[\]\\]/g,'\\$&')+')','gi'),'<span class="exhl">$1</span>');
+}
+
+function updStats(){
+  var k=kn().length,wkl=wk().length,tot=words.length;
+  g('stot').textContent=tot;g('skn').textContent=k;g('swk').textContent=wkl;
+  g('cntbadge').textContent=tot+' kelime';
+  g('ring').style.strokeDashoffset=113*(1-(tot>0?k/tot:0));
+}
+
+function goTab(name){
+  ['fc','qz','add'].forEach(function(n){
+    g('sc-'+n).className='sc'+(n===name?' on':'');
+    g('tab-'+n).className='tb'+(n===name?' on':'');
+  });
+  if(name==='qz')startQuiz(false);
+  if(name==='add')renderList();
+}
+
+function setDir(d){
+  fcDir=d;
+  g('dEN').className='db'+(d==='EN'?' on':'');
+  g('dTR').className='db'+(d==='TR'?' on':'');
+  idx=0;setFlip(false);renderFC();
+}
+
+function doShuffle(){pool=sfl(pool);idx=0;setFlip(false);renderFC();}
+
+function toggleWeak(){
+  var w=wk();
+  if(!wkMode&&w.length===0){toast('"Bilmedim" dediğin kelime yok!','tr');return;}
+  wkMode=!wkMode;
+  pool=sfl(wkMode?wk():words.slice());
+  idx=0;setFlip(false);
+  g('wkbtn').className='smbtn'+(wkMode?' ron':'');
+  g('wkbtn').textContent=wkMode?'✓ Zayıf Mod':'🔴 Zayıflarım';
+  updWkPanel();renderFC();
+}
+
+function updWkPanel(){
+  var panel=g('wkpanel'),w=wk();
+  if(!wkMode||w.length===0){panel.style.display='none';return;}
+  panel.style.display='block';
+  g('wksub').textContent=pool.length+' kelime gösteriliyor';
+  var t=pool.slice(0,6).map(function(x){return'<span class="wtag">'+x.en+'</span>';}).join('');
+  if(pool.length>6)t+='<span class="wtag">+'+(pool.length-6)+'</span>';
+  g('wktags').innerHTML=t;
+}
+
+function setFlip(v){
+  flipped=v;
+  g('inner').className='inner'+(v?' flip':'');
+}
+
+function renderFC(){
+  var sc=g('scene'),nav=g('fcnav'),marks=g('fcmarks'),emp=g('fcempty');
+  if(pool.length===0){
+    sc.style.display='none';nav.style.display='none';marks.style.display='none';emp.style.display='block';
+    g('fcei').textContent=wkMode?'🎉':'📚';
+    g('fcem').textContent=wkMode?'Tüm zayıf kelimeler tamamlandı! 🎉':'Kelime yok.';
+    return;
+  }
+  sc.style.display='';nav.style.display='';marks.style.display='';emp.style.display='none';
+  if(idx>=pool.length)idx=0;
+  var w=pool[idx],st=prog[w.en];
+  var fr=g('front'),badge=g('cbadge');
+  fr.className='face fr'+(st===true?' gg':st===false?' gr':'');
+  if(st===true){badge.style.display='';badge.className='cbadge kg';badge.textContent='✓ Biliniyor';}
+  else if(st===false){badge.style.display='';badge.className='cbadge kr';badge.textContent='✗ Zayıf';}
+  else{badge.style.display='none';}
+  g('flbl').textContent=fcDir==='EN'?'İngilizce':'Türkçe';
+  g('fword').textContent=fcDir==='EN'?w.en:w.tr;
+  g('blbl').textContent=fcDir==='EN'?'Türkçe':'İngilizce';
+  g('bword').textContent=fcDir==='EN'?w.tr:w.en;
+  g('fcinfo').textContent=(idx+1)+' / '+pool.length;
+  g('fcpb').style.width=((idx+1)/pool.length*100)+'%';
+  var exw=g('exw'),exen=g('exen'),extr=g('extr');
+  if(fcDir==='EN'&&SENTENCES[w.en]){
+    exw.style.display='';
+    exen.innerHTML=hlW(SENTENCES[w.en].en,w.en);
+    extr.textContent=SENTENCES[w.en].tr;
+  }else{exw.style.display='none';exen.innerHTML='';extr.textContent='';}
+}
+
+function flipCard(){if(!busy)setFlip(!flipped);}
+function nextCard(){idx=(idx+1)%pool.length;setFlip(false);renderFC();}
+function prevCard(){idx=(idx-1+pool.length)%pool.length;setFlip(false);renderFC();}
+
+function mark(known){
+  if(pool.length===0||busy)return;
+  var w=pool[idx],prev=prog[w.en];
+  prog[w.en]=known;
+  if(wkMode&&known){
+    pool.splice(idx,1);
+    if(pool.length===0){updStats();saveData();renderFC();return;}
+    idx=idx%pool.length;
+    toast('✓ "'+w.en+'" öğrenildi! 🎉','tg');
+  }else{
+    if(!known&&prev!==false)toast('✗ "'+w.en+'" zayıf listene eklendi','tr');
+    else if(known&&prev!==true)toast('✓ "'+w.en+'" öğrenildi!','tg');
+    idx=(idx+1)%pool.length;
+  }
+  updStats();updWkPanel();saveData();
+  busy=true;
+  var sc=g('scene');
+  sc.style.cssText='transition:transform .22s ease,opacity .22s ease;transform:translateX('+(known?'70px':'−70px')+') rotate('+(known?'3':'−3')+'deg);opacity:0';
+  setTimeout(function(){
+    sc.style.cssText='transition:none;transform:translateX('+(known?'−30px':'30px')+');opacity:0';
+    setFlip(false);renderFC();
+    setTimeout(function(){
+      sc.style.cssText='transition:transform .22s ease,opacity .22s ease;transform:translateX(0);opacity:1';
+      setTimeout(function(){busy=false;sc.style.cssText='';},240);
+    },16);
+  },230);
+}
+
+function startQuiz(onlyWeak){
+  var p=onlyWeak?wk():words;
+  g('qzscore').style.display='none';g('qzempty').style.display='none';g('qzarea').style.display='';
+  if(p.length<4){
+    g('qzarea').style.display='none';g('qzempty').style.display='block';
+    g('qzemmsg').textContent=onlyWeak?'Zayıf listende en az 4 kelime olmalı!':'En az 4 kelime gerekli.';return;
+  }
+  qpool=sfl(p);qidx=0;qscore=0;qdone=false;qanswered=false;renderQuiz();
+}
+
+function renderQuiz(){
+  if(qidx>=qpool.length){
+    g('qzarea').style.display='none';g('qzscore').style.display='block';
+    var p=qscore/qpool.length;
+    g('snum').textContent=qscore+'/'+qpool.length;
+    g('semoji').textContent=p>=.8?'🎉':p>=.5?'👍':'📖';return;
+  }
+  qanswered=false;
+  var w=qpool[qidx],showEN=Math.random()>.5;
+  g('qlbl').textContent=showEN?'Bu kelimenin Türkçesi nedir?':'Bu kelimenin İngilizcesi nedir?';
+  g('qword').textContent=showEN?w.en:w.tr;
+  g('qzpb').style.width=(qidx/qpool.length*100)+'%';
+  var qs=g('qsent');qs.innerHTML='';
+  if(showEN&&SENTENCES[w.en])qs.innerHTML=hlW(SENTENCES[w.en].en,w.en);
+  var correct=showEN?w.tr:w.en;
+  var wrong=sfl(words.filter(function(x){return x.en!==w.en;})).slice(0,3).map(function(x){return showEN?x.tr:x.en;});
+  var opts=sfl([correct].concat(wrong));
+  var c=g('qopts');c.innerHTML='';
+  opts.forEach(function(o){
+    var b=document.createElement('button');
+    b.className='qopt';b.textContent=o;
+    b.onclick=function(){answerQ(b,o===correct,correct,w,showEN);};
+    c.appendChild(b);
+  });
+}
+
+function answerQ(btn,ok,correct,w,wasEN){
+  if(qanswered)return;qanswered=true;
+  if(wasEN){prog[w.en]=ok;saveData();updStats();}
+  if(ok){btn.className='qopt ok';qscore++;}
+  else{
+    btn.className='qopt no';
+    var bs=document.querySelectorAll('.qopt');
+    for(var i=0;i<bs.length;i++){if(bs[i].textContent===correct)bs[i].className='qopt ok';}
+  }
+  var all=document.querySelectorAll('.qopt');
+  for(var i=0;i<all.length;i++)all[i].disabled=true;
+  setTimeout(function(){qidx++;renderQuiz();},1300);
+}
+
+g('iEn').addEventListener('keydown',function(e){if(e.keyCode===13)addWord();});
+g('iTr').addEventListener('keydown',function(e){if(e.keyCode===13)addWord();});
+
+function addWord(){
+  var en=g('iEn').value.replace(/^\s+|\s+$/g,'').toLowerCase();
+  var tr=g('iTr').value.replace(/^\s+|\s+$/g,'').toLowerCase();
+  if(!en||!tr)return;
+  var exists=false;
+  for(var i=0;i<words.length;i++){if(words[i].en===en){exists=true;break;}}
+  if(exists){
+    var inp=g('iEn');inp.className='fi err';
+    setTimeout(function(){inp.className='fi';},1000);return;
+  }
+  words.push({en:en,tr:tr});
+  if(!wkMode)pool=words.slice();
+  g('iEn').value='';g('iTr').value='';g('iEn').focus();
+  renderList();updStats();
+}
+
+function delWord(en){
+  var nw=[];for(var i=0;i<words.length;i++){if(words[i].en!==en)nw.push(words[i]);}words=nw;
+  delete prog[en];
+  var np=[];for(var i=0;i<pool.length;i++){if(pool[i].en!==en)np.push(pool[i]);}pool=np;
+  if(idx>=pool.length)idx=Math.max(0,pool.length-1);
+  saveData();renderList();updStats();
+}
+
+function renderList(){
+  var q=(g('srch').value||'').toLowerCase();
+  var f=q?words.filter(function(w){return w.en.indexOf(q)>-1||w.tr.indexOf(q)>-1;}):words;
+  var list=g('wlist'),emp=g('addempty');
+  list.innerHTML='';
+  if(f.length===0){emp.style.display='block';return;}
+  emp.style.display='none';
+  for(var i=0;i<f.length;i++){
+    var w=f[i],st=prog[w.en];
+    var cls='wi'+(st===true?' gk':st===false?' rk':'');
+    var badge=st===true?'<span class="wb g">✓</span>':st===false?'<span class="wb r">✗</span>':'';
+    var div=document.createElement('div');div.className=cls;
+    div.innerHTML='<div class="wit"><span class="wen">'+w.en+'</span><span class="wsep"> — </span><span class="wtr">'+w.tr+'</span>'+badge+'</div><button class="delbtn" onclick="delWord(\''+w.en.replace(/'/g,"\\'")+'\')\">✕</button>';
+    list.appendChild(div);
+  }
+}
+
+// INIT
+loadData();
+pool=sfl(words.slice());
+updStats();
+renderFC();
+</script>
+</body>
+</html>
